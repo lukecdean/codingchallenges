@@ -747,6 +747,7 @@ public class Grind75 {
 
     // 542. 01 Matrix
     // O(n)/O(n) 39/85 @ 26ms;
+    // Uses the BFS approach, I would like to implement the DP solution though. TODO
     int[] DIR = new int[]{0, 1, 0, -1, 0};
     public int[][] updateMatrix(int[][] mat) {
         int m = mat.length;
@@ -880,6 +881,32 @@ public class Grind75 {
         } // while
         return mid;
     } // middleNode()
+
+    // 973. K Closest Points to Origin
+    //
+    public int[][] kClosest(int[][] points, int k) {
+        // a max heap sorted by distance
+        PriorityQueue<int[]> q = new PriorityQueue<int[]>(k, ((int[] p1, int[] p2) -> (distanceFromO(p1) < distanceFromO(p2) ? 1 : -1)));
+        System.out.println("here");
+        // add the first k elements to save some calculations later
+        for (int i = 0; i < k; i++) {
+            q.offer(points[i]);
+        } // for i
+        // now start adding to the heap if the point is close enough
+        for (int p = k; p < points.length; p++) {
+            // if new point is closer than q.peek, offer and poll
+            if (distanceFromO(points[p]) < distanceFromO(q.peek()))
+                    q.offer(points[p]);
+            q.poll();
+        } // for p
+        return q.toArray(new int[0][0]);
+    } // kClosest()
+    private double distanceFromO(int[] point) {
+        return distanceEuclidian(point[0], point[1], 0, 0);
+    } // distanceFromO()
+    private double distanceEuclidean(int x1, int y1, int x2, int y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    } // distanceEuclidian()
 
 
 } // class
