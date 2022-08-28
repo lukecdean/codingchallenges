@@ -884,10 +884,10 @@ public class Grind75 {
 
     // 973. K Closest Points to Origin
     //
-    public int[][] kClosest(int[][] points, int k) {
+    public int[][] kClosest0(int[][] points, int k) {
         // a max heap sorted by distance
         PriorityQueue<int[]> q = new PriorityQueue<int[]>(k, ((int[] p1, int[] p2) -> (distanceFromO(p1) < distanceFromO(p2) ? 1 : -1)));
-        System.out.println("here");
+        //System.out.println("here");
         // add the first k elements to save some calculations later
         for (int i = 0; i < k; i++) {
             q.offer(points[i]);
@@ -907,6 +907,36 @@ public class Grind75 {
     private double distanceEuclidean(int x1, int y1, int x2, int y2) {
         return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     } // distanceEuclidian()
+    // O(nlogn)/O(k) 52/70 @ 50ms
+    public int[][] kClosest1(int[][] points, int k) {
+        // make a max heap
+        PriorityQueue<int[]> q = new PriorityQueue<int[]>(
+                k, (int[] p1, int[] p2) -> (eD(p1)) < eD(p2) ? 1 : -1
+                );
+        for (int[] p : points) {
+            q.offer(p);
+            while (q.size() > k) q.poll();
+        } // for
+        return q.toArray(new int[k][2]);
+    } // kClosest()
+    // O(nlogn)/O(k) 83/92 @ 33ms
+    public int[][] kClosest(int[][] points, int k) {
+        // make a max heap
+        PriorityQueue<int[]> q = new PriorityQueue<int[]>(
+                k, (int[] p1, int[] p2) -> (eD(p1)) < eD(p2) ? 1 : -1
+                );
+        for (int i = 0; i < k; i++) q.offer(points[i]);
+        for (int i = k; i < points.length; i++) {
+            if (eD(points[i]) < eD(q.peek())) {
+                q.offer(points[i]);
+                q.poll();
+            } 
+        } // for
+        return q.toArray(new int[k][2]);
+    } // kClosest()
+    private double eD(int[] p) {
+        return distanceEuclidian(p[0], p[1], 0, 0);
+    } // eD
 
 
 } // class
