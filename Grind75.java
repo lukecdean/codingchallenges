@@ -17,6 +17,56 @@ public class Grind75 {
         return res;
     } // twoSum()
 
+    // 3. Longest Substring Without Repeating Characters
+    // O(n)/O(1) 23/98 @ 35ms
+    public int lengthOfLongestSubstring0(String s) {
+        //if (s.length() == 0 || s.length() == 1) return s.length();
+        Queue<Character> q = new LinkedList<>();
+        int max = 0;
+        for (int i = 0; i < s.length(); i++) {
+            while (q.contains(s.charAt(i))) q.poll(); 
+            q.offer(s.charAt(i));
+            max = max > q.size() ? max : q.size();
+        } // for
+        return max;
+    } // lengthOfLongstSubstring()
+    // 62/ @ 12ms; 86/ @ 7ms
+    public int lengthOfLongestSubstring1(String s) {
+        if (s.length() == 0 || s.length() == 1) return s.length();
+        // using a set and a ptr to effectively make a queue
+        HashSet<Character> set = new HashSet<>();
+        set.add(s.charAt(0));
+        int max = 1;
+        int sptr = 0;
+        for (int i = 1; i < s.length(); i++) {
+            // 'dequeue' while the char i is in the set
+            while (set.contains(s.charAt(i))) {
+                set.remove(s.charAt(sptr));
+                sptr++;
+            } // while
+            // once char i is not in the set, add it and find max
+            set.add(s.charAt(i));
+            max = max > set.size() ? max : set.size();
+        } // for
+        return max;
+    } // lengthOfLongstSubstring()
+    // based on a solution from the leetcode discussion
+    // 97/74 @ 4ms
+    public int lengthOfLongestSubstring(String str) {
+        int max = 0;
+        int s = 0; // start ptr
+        int e = 0; // end ptr
+        // the val at the index is the char of the string after the most recent appearance of the current char
+        int[] cache = new int[256];
+        while (e < str.length()) {
+            s = s > cache[str.charAt(e)] ? s : cache[str.charAt(e)];
+            cache[str.charAt(e)] = e + 1;
+            max = max > e - s + 1 ? max : e - s + 1;
+            e++;
+        } // while
+        return max;
+    } // lengthOfLongstSubstring()
+
     // 13. Roman to Integer
     // 71/61 @ 7ms; 94/64 @ 5ms
     public int romanToInt0(String s) {
