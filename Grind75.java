@@ -642,6 +642,100 @@ public class Grind75 {
         return false;
     } // hasCycle()
 
+    // 150. Evaluate Reverse Polish Notation
+    //
+    public int evalRPN0(String[] tokens) {
+        int i = tokens.length;
+        while (tokens[i] == null) i--;
+        String operator = tokens[i];
+        tokens[i] == null;
+        if (operator.isDigit()) return Integer.parseInt(operator);
+        int a = evalRPN(tokens);
+        int b = evalRPN(tokens);
+        switch (operator) {
+            case "+":
+                return a + b;
+            case "-":
+                return a - b;
+            case "*":
+                return a * b;
+            default: return a / b; // case "/":
+        } // switch
+    } // evalRPN()
+    public int evalRPN1(String[] tokens) {
+        return evalRPNR(tokens, tokens.length - 1);
+    } // evalRPN()
+    public int evalRPNR(String[] tokens, int nextOperand) {
+        String operator = tokens[nextOperand];
+        if (Character.isDigit(operator.charAt(0))) return Integer.parseInt(operator);
+        int a = evalRPNR(tokens, nextOperand - 2);
+        int b = evalRPNR(tokens, nextOperand - 1);
+        switch (operator) {
+            case "+":
+                return a + b;
+            case "-":
+                return a - b;
+            case "*":
+                return a * b;
+            default: return a / b; // case "/":
+        } // switch
+    } // evalRPN(R)
+    // 6/82 @ 43ms
+    public int evalRPN2(String[] tokens) {
+        return evalRPNR(tokens, tokens.length - 1);
+    } // evalRPN()
+    public int evalRPNR(String[] tokens, int nextOperand) {
+        while (tokens[nextOperand] == null) nextOperand--; // it will be the first non null token
+        String operator = tokens[nextOperand];
+        tokens[nextOperand] = null; // null out the token once it's been pulled
+        // if digit, return it
+        if (Character.isDigit(operator.charAt(operator.length() - 1)))
+            return Integer.parseInt(operator);
+        // else it is an operator and the next operands need to be found
+        int b = evalRPNR(tokens, nextOperand - 1);
+        int a = evalRPNR(tokens, nextOperand - 2);
+        switch (operator) {
+            case "+": return a + b;
+            case "-": return a - b;
+            case "*": return a * b;
+            case "/": return a / b;
+            default:  return a * b;
+        } // switch
+    } // evalRPN()
+    // O(n)/O(n) 68/39 @ 8ms; 91/89 @ 6ms
+    public int evalRPN2(String[] tokens) {
+        Stack<Integer> stack = new Stack<>();
+        for (String token : tokens) {
+            // if a digit, add it to the stack
+            if (Character.isDigit(token.charAt(token.length() - 1))) {
+                stack.push(Integer.parseInt(token));
+                continue;
+            } // if
+            // else it is an operand so pop the last two digits and operate
+            int b = stack.pop();
+            int a = stack.pop();
+            int res;
+            switch (token) {
+                case "+":
+                    res = a + b;
+                    break;
+                case "-":
+                    res = a - b;
+                    break;
+                case "*":
+                    res = a * b;
+                    break;
+                case "/":
+                    res = a / b;
+                    break;
+                default:
+                    res = a + b;
+            } // switch
+            stack.push(res); // put the res in the stack
+        } // for
+        return stack.peek();
+    } // evalRPN()
+
     // 169. Majority Element
     //
     public int majorityElement0(int[] nums) {
@@ -743,9 +837,8 @@ public class Grind75 {
     // 89/72 @ 8ms; 
     public boolean containsDuplicate(int[] nums) {
         HashSet<Integer> set = new HashSet<>();
-        for (int i : nums) {
+        for (int i : nums)
             if (set.add(i) == false) return true;
-        } // for
         return false;
     } // containsDuplicate()
 
