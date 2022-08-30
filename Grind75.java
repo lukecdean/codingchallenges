@@ -118,37 +118,70 @@ public class Grind75 {
     } // romanToInt()
 
 
-    // 20. Valid Parentheses
-    // 91/34
-    public boolean isValid(String s) {
-        Stack<Character> stack = new Stack<>();
-        char chari;
-        for (int i = 0; i < s.length(); i++) {
-            chari = s.charAt(i);
-            if (chari == '(' || chari == '{' || chari == '[') {
-                stack.push(chari);
-            } else {
-                if (stack.size() == 0) 
-                    return false;
-                switch (chari) {
-                    case ')':
-                        if (stack.pop() != '(')
-                            return false;
-                        break;
-                    case '}':
-                        if (stack.pop() != '{')
-                            return false;
-                        break;
-                    case ']':
-                        if (stack.pop() != '[')
-                            return false;
-                        break;
-                } // switch
-            } // if
+    // 15. 3Sum
+    // this has become an absolute disaster
+    public List<List<Integer>> threeSum0(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        Map<Integer, List<List<Integer>>> doubles = new HashMap<>();
+        // get each sum of two that is possible
+        // mapping each sum to a list of the pairs that sum to it
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                // if no lists of this sum exist, make a key/list map
+                if (!doubles.containsKey(nums[i] + nums[j])) {
+                    doubles.put(nums[i] + nums[j], new ArrayList<List<Integer>>());
+                } // if
+                List<Integer> l = new ArrayList<Integer>();
+                if (nums[i] < nums[j]) {
+                    l.add(nums[i]);
+                    l.add(nums[j]);
+                } else {
+                    l.add(nums[j]); 
+                    l.add(nums[i]);
+                } // if
+                Collections.sort(l);
+                if (!alreadyExists(doubles.get(nums[i] + nums[j]), l)) doubles.get(nums[i] + nums[j]).add(l);
+            } // for j
+        } // for i
+        // now iterate through nums looking for -1*nums[i] in the doubles map
+        for (int i = 0; i < nums.length; i++) {
+            // if a doubles giving that sum exist, create new lists with triples
+            if (!doubles.containsKey(-1 * nums[i])) continue;
+            // create a triple for each list in the index of doubles
+            for (int j = 0; j < doubles.get(-1 * nums[i]).size(); j++) {
+                // remove the list so it cannot be used again
+                List<Integer> l = doubles.get(-1 * nums[i]).remove(j);
+                // insert to maintain sorted order
+                int k = 0;
+                while (k < l.size()) {
+                    if (nums[i] < l.get(k)) break;
+                } // while
+                l.add(k, nums[i]);
+                // check if this triple already exists
+                addTriple(res, l);
+            } // for j
+        } // for i
+        return res;
+    } // threeSum()
+    private boolean alreadyExists(List<List<Integer>> list, List<Integer> newList) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).get(0) == newList.get(0))
+                if (list.get(i).get(1) == newList.get(1))
+                    return true;
+        } // for i
+        return false;
+    } // alreadyExists()
+    private void addTriple(List<List<Integer>> list, List<Integer> newList) {
+        for (int i = 0; i < list.size(); i++) {
+            if (    list.get(i).get(0) == newList.get(0) &&
+                    list.get(i).get(1) == newList.get(1) &&
+                    list.get(i).get(2) == newList.get(2)) {
+                return;
+                    } // if
         } // for
-        return stack.size() == 0;
-    } // isValid()
-    
+        list.add(newList);
+    } // tripleExists()
+
     // 21. Merge Two Sorted Lists
     // 80/29
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
@@ -357,6 +390,122 @@ public class Grind75 {
         return ways;
     } // climbStairs()
 
+    // 102. Binary Tree Level Order Traversal
+    //
+    public List<List<Integer>> levelOrder01(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        Queue<TreeNode> q = new LinkedList<TreeNode>(); // for BFS
+        q.add(null); // the initial elements
+        q.add(root);
+        while (!q.isEmpty()) {
+            // do the BFS
+            List<Integer> l = new ArrayList<Integer>();
+            TreeNode a = q.poll();
+            if (a != null) {
+                q.offer(a.left);
+                q.offer(a.right);
+                l.add(a.val);
+            } // if
+            TreeNode b = q.poll();
+            if (b != null) {
+                q.offer(b.left);
+                q.offer(b.right);
+                l.add(b.val);
+            } // if
+            if (l.size() > 0) res.add(l);
+        } // while
+        return res;
+    } // levelOrder()
+    public List<List<Integer>> levelOrder1(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        if (root == null) return res;
+        Queue<TreeNode> q = new LinkedList<TreeNode>(); // for BFS
+        boolean hasNextLevel = false; // want to know if there is a next level (ie a non-null below)
+        int level = 0; // level -> power of 2
+        int ct = 0;
+        int curLevelNulls = 0;
+        int nextLevelNulls = 0;
+        List<Integer> l = new ArrayList<>();
+        q.offer(root); // the initial node
+        while (!q.isEmpty()) {
+            // process the next element
+            TreeNode node = q.poll();
+            if (node == null) {
+                nextLevelNulls += 2;
+            } else {
+                l.add(node.val);
+                q.offer(node.left);
+                q.offer(node.right);
+                if (hasNextLevel == false && (node.left != null || node.right != null))
+                    hasNextLevel = true;
+            } // if
+            ct++;
+            System.out.printf("level: %d, ct: %d, nLN: %d\n", level, ct, nextLevelNulls);
+            
+            // check if the next level has been reached
+            if (isNthPowerOfTwo(ct + curLevelNulls, level)) { // we have reached the end of a level
+                res.add(l);
+                if (!hasNextLevel) break; // if there is no next level, work is done
+                hasNextLevel = false;
+                level++;
+                ct = 0;
+                curLevelNulls = nextLevelNulls; // next level is now current level
+                nextLevelNulls *= 2; // because each null will give two nulls in the next level
+                l = new ArrayList<>(); // new list for the level
+            } // if
+        } // while
+        return res;
+    } // levelOrder()
+    private boolean isNthPowerOfTwo(int ct, int level) {
+        // level corresponds to which power of two is next
+        if ((ct & (1 << level)) > 0) return true;
+        return false;
+        /*
+        //if (n < 0) return false;
+        while (n > 1) {
+            if ((n % 2) != 0) return false;
+            n /= 2;
+        } // while
+        return true;
+        */ 
+    } // isPowerOfTwo()
+    // O(n)/O(n) 93/48 @ 1ms
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        if (root == null) return res; // edge case
+        Queue<TreeNode> q = new LinkedList<TreeNode>(); // for BFS
+        int nodesLeft = 1; // how many nodes to process in this level
+        int nextLevelNodes = 0; // how many nodes to process in the next level
+        TreeNode node; // working var for node
+        TreeNode[] lr = new TreeNode[2]; // working var for children
+        List<Integer> l = new ArrayList<>();
+        q.offer(root); // initial member
+        while (nodesLeft > 0) {
+            // process node
+            node = q.poll();
+            l.add(node.val);
+            lr[0] = node.left;
+            lr[1] = node.right;
+            // check the children
+            for (TreeNode tn : lr) {
+                if (tn != null) {
+                    q.offer(tn);
+                    nextLevelNodes++;
+                } // if
+            } // for
+            nodesLeft--;
+
+            if (nodesLeft == 0) { // end of a level reached
+                // set vars as needed
+                nodesLeft = nextLevelNodes;
+                nextLevelNodes = 0;
+                res.add(l);
+                l = new ArrayList<>();
+            } // if
+        } // while
+        return res;
+    } // levelOrder()
+
     // 104. Maximum Depth of Binary Tree
     // 100/93
     public int maxDepth(TreeNode root) {
@@ -420,7 +569,7 @@ public class Grind75 {
         } // for
         return max;
     } // maxProfit()
-    
+
     // 121. Valid Palindrome
     // 78/70 @ 5 ms
     public boolean isPalindrome(String s) {
@@ -456,6 +605,23 @@ public class Grind75 {
         // only gets here if there is no other alphanum
         return -1;
     } // nextAlphaNumChar()
+
+    // 133. Clone Graph
+    // O(n)/O(n) 100/98 @ 25ms
+    public Node cloneGraph(Node node) {
+        if (node == null) return node;
+        Set<Integer> set = new HashSet<>();
+        Map<Integer, Node> map = new HashMap<>(); // map for the cloned nodes
+        return cloneGraphR(node, map);
+    } // cloneGraph()
+    public Node cloneGraphR(Node node, Map<Integer, Node> map) {
+        if (map.containsKey(node.val)) return map.get(node.val); // if already cloned, return the node from map
+        Node clone = new Node(node.val); // clone of the node itself
+        map.put(node.val, clone); // hash the node so we know it's being cloned
+        for (Node neighbor : node.neighbors)
+            clone.neighbors.add(cloneGraphR(neighbor, map));
+        return clone;
+    } // cloneGraphR()
 
     // 141. Linked List Cycle
     // 100/40,67 @ 0ms; 
