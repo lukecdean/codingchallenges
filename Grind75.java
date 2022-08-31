@@ -833,6 +833,162 @@ public class Grind75 {
         return newHead;
     } // reverseList()
 
+    // 207. Course Schedule
+    //
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // compile the prereqs into a set for each course
+        //Set<Integer>[] prereqs = new HashSet<>[numCourses];
+        List<Set<Integer>> prereqs = new ArrayList<>(numCourses);
+        for (int[] prereq : prerequisites) {
+            prereqs.get(prereq[0]).add(prereq[1]);
+        } // for
+        //Set<Integer> parents = new HashSet<>();
+        // if a course is not in here, its subprereqs have not been found
+        Set<Integer> subPrereqsAdded = new HashSet<>();
+        for (int course = 0; course < numCourses; course++) {
+            // prereqs[course].add(addSubReqs(course, prereqs, subPrereqsAdded));
+            addSubReqs(course, prereqs, subPrereqsAdded);
+        } // for
+        for (int course = 0; course < numCourses; course++) {
+            if (prereqs.get(course).contains(course)) return false;
+        } // for
+        return true;
+    } // canFinish()
+    private Set<Integer> addSubReqs(int course, List<Set<Integer>> prereqs, Set<Integer> subPrereqsAdded) {
+        if (subPrereqsAdded.add(course) == false) return prereqs.get(course);
+        for (int prereq : prereqs.get(course)) {
+            prereqs.get(course).add(addSubReqs(prereq, prereqs, subPrereqsAdded));
+        } // for
+        return prereqs.get(course);
+        /*
+        Set<Integer> subreqs = new HashSet<>();
+        for (int prereq : prereqs[course]) {
+            subreqs.addAll(addSubReqs(prereq, prereqs, subPrereqsAddded));
+        } // for prereq
+        */
+    } // addSubReqs()
+    // O(n^2)/O(n^2) 5/5; awful runtime and memory usage.
+    // TODO
+    public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // create and initialize list of sets 
+        List<Set<Integer>> prereqs = new ArrayList<Set<Integer>>(numCourses);
+        for (int i = 0; i < numCourses; i++)
+            prereqs.add(new HashSet<Integer>());
+        // compile the prereqs
+        for (int[] prereq : prerequisites)
+            prereqs.get(prereq[0]).add(prereq[1]);
+        // the key is that each prereq's prereq (sub prereq) is also a prereq.
+        // so DFS to add all of the sub prereqs to the prereqs set
+        boolean[] visited = new boolean[numCourses];
+        // for (int course = 0; course < numCourses; course++)
+            // prereqs.get(course).add(getSubPrereqs(course, prereqs, visited));
+        for (int course = 0; course < numCourses; course++) {
+            getSubPrereqs(course, prereqs, visited);
+            if (prereqs.get(course).contains(course)) return false;
+            /*
+            for (Integer subprereq : getSubPrereqs(course, prereqs, visited)) {
+                if (subprereq == course) return false; // if the course is a sub prereq, cycle
+                else prereqs.get(course).add(subprereq);
+            } // for subprereq
+            */
+        } // for course
+        return true;
+    } // canFinish()
+    // a DFS to get all subprereqs
+    private Set<Integer> getSubPrereqs(int course, List<Set<Integer>> prereqs, boolean[] visited) {
+        if (visited[course]) return prereqs.get(course);
+        visited[course] = true;
+        Set<Integer> subprereqs = new HashSet<Integer>();
+        // compile the subprereqs
+        for (Integer prereq : prereqs.get(course))
+            subprereqs.addAll(getSubPrereqs(prereq, prereqs, visited));
+        prereqs.get(course).addAll(subprereqs);
+        return prereqs.get(course);
+    } // getSubPrereqs()
+
+    // 208. Implement Trie
+    class Trie0 {
+    // O(n)/O(n)
+    // overly complex and should make nodes instead of sub Tries
+    // only failed the large testcase and the output is too unruly to see why
+        private boolean anEnd;
+        Map<Character, Trie> prefixes;
+
+        public Trie() {
+            prefixes = new HashMap<Character, Trie>();
+            anEnd = false;
+        }
+
+        public void insert(String word) {
+            insert(word, 0);
+        }
+        // return true on the first out of bounds index
+        private boolean insert(String word, int index) {
+            if (index >= word.length())
+                return true;
+            char cur = word.charAt(index);
+            // if prefixes doesn't have the next char, make a new Trie for it
+            if (!prefixes.containsKey(cur))
+                prefixes.put(cur, new Trie());
+            // add the next char, if a false, mark this Trie as an and
+            if (prefixes.get(cur).insert(word, index + 1))
+                anEnd = true;
+            return false;
+        } // insert
+
+        public boolean search(String word) {
+            return find(word, true);
+        }
+
+        public boolean startsWith(String prefix) {
+            return find(prefix, false);
+        }
+
+        public boolean find(String s, boolean fullWord) {
+            Trie curTrie = this;
+            char curChar;
+            for (int ch = 0; ch < s.length(); ch++) {
+                curChar = s.charAt(ch);
+                // if the current char is not in prefixes
+                if (!curTrie.prefixes.containsKey(curChar))
+                    return false;
+                // if looking for full word:
+                // if it's the end of the word, check if the Trie is anEnd
+                if (fullWord && ch == s.length() - 1 && curTrie.isAnEnd())
+                    return true;
+                // go to the next Trie
+                curTrie = curTrie.prefixes.get(curChar);
+            } // for ch
+            // if execution made it here, no mismatch chars were found
+            // in this case, full word was not found but prefix was so
+            // fullWord can just be flipped and returned
+            return !fullWord;
+        }
+
+        private boolean isAnEnd() {
+            return anEnd;
+        } // isAnEnd()
+    } // class Trie0
+    // TODO
+    class Trie {
+
+        public Trie() {
+
+        }
+
+        public void insert(String word) {
+
+        }
+
+        public boolean search(String word) {
+
+        }
+
+        public boolean startsWith(String prefix) {
+
+        }
+    } // class Trie
+
     // 217. Contains Duplicate
     // 89/72 @ 8ms; 
     public boolean containsDuplicate(int[] nums) {
@@ -901,6 +1057,51 @@ public class Grind75 {
         if (p.val < root.val) return lowestCommonAncestor(root.left, p, q);
         else return lowestCommonAncestor(root.right, p, q);
     } // lowestCommonAncestor()
+
+    // 238. Product of Array Except Self
+    // 89/90 @ 2ms
+    public int[] productExceptSelf(int[] nums) {
+        int[] pre = new int[nums.length];
+        pre[0] = 1; // because suf of the beginning is 1
+        // get the products of the nums before
+        for (int i = 1; i < pre.length; i++)
+            pre[i] = nums[i - 1] * pre[i - 1];
+        // get the products of the nums after
+        int[] suf = new int[nums.length];
+        suf[suf.length - 1] = 1; // because suf of the beginning is 1
+        for (int i = suf.length - 2; i >= 0; i--)
+            suf[i] = nums[i + 1] * suf[i + 1];
+        // now multiply each corresponding index in pre and suf for the answer
+        // will write into suf
+        for (int i = 0; i < suf.length; i++)
+            suf[i] = pre[i] * suf[i];
+        return suf;
+    } // productExceptSelf()
+    // 89/31 @ 2ms
+    public int[] productExceptSelf(int[] nums) {
+        int[] pre = new int[nums.length];
+        pre[0] = 1; // because suf of the beginning is 1
+        // get the products of the nums before
+        for (int i = 1; i < pre.length; i++)
+            pre[i] = nums[i - 1] * pre[i - 1];
+        // get the products of the nums after
+        // will write into the nums/suf arr because the values will no longer be needed
+        int[] suf = nums;
+        // this uses 66% of the space (2 n length arrs instead of 3)
+        int prevNum = suf[suf.length - 1];
+        suf[suf.length - 1] = 1;
+        int curNum;
+        for (int i = suf.length - 2; i >= 0; i--) {
+            curNum = suf[i];
+            suf[i] = suf[i + 1] * prevNum;
+            prevNum = curNum;
+        } // for
+        // now multiply each corresponding index in pre and suf for the answer
+        // will write into suf
+        for (int i = 0; i < suf.length; i++)
+            suf[i] = pre[i] * suf[i];
+        return suf;
+    } // productExceptSelf()
 
     // 242. Valid Anagram
     // 73/68 @ 5 ms; 
@@ -982,6 +1183,11 @@ public class Grind75 {
         } // while
         return mid;
     } // firstBadVersion()
+
+    // 322. Coin Change
+    // TODO
+    public int coinChange(int[] coins, int amount) {
+    } // coinChange()
 
     // 338. Counting Bits
     // 88/ @ 2ms
