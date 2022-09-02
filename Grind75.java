@@ -390,6 +390,39 @@ public class Grind75 {
         return ways;
     } // climbStairs()
 
+    // 98. Validate Binary Search Tree
+    // O(n)/ : 100/ @ 0ms
+    // The key concept was found but it can be done with much less code. TODO
+    public boolean isValidBST(TreeNode root) {
+        int leftTreeMax = Integer.MAX_VALUE;
+        int rightTreeMin = Integer.MIN_VALUE;
+        return isValidBSTR(root, leftTreeMax, rightTreeMin);
+    } // isValidBST()
+    private boolean isValidBSTR(TreeNode root, int leftTreeMax, int rightTreeMin) {
+        if (root == null) return true;
+        boolean leftIsBST;
+        boolean rightIsBST;
+        if (root.left != null) {
+            if (    root.left.val >= root.val ||
+                    root.left.val < rightTreeMin ||
+                    root.left.val > leftTreeMax)
+                return false;
+            int newLeftTreeMax = Math.min(leftTreeMax, root.val - 1);
+            if (isValidBSTR(root.left, newLeftTreeMax, rightTreeMin) == false)
+                return false;
+        } // left if 
+        if (root.right != null) {
+            if (    root.right.val <= root.val ||
+                    root.right.val < rightTreeMin ||
+                    root.right.val > leftTreeMax)
+                return false;
+            int newRightTreeMin = Math.max(rightTreeMin, root.val + 1);
+            if (isValidBSTR(root.right, leftTreeMax, newRightTreeMin) == false)
+                return false;
+        } // right if 
+        return true;
+    } // isValidBSTR()
+
     // 102. Binary Tree Level Order Traversal
     //
     public List<List<Integer>> levelOrder01(TreeNode root) {
@@ -736,6 +769,49 @@ public class Grind75 {
         return stack.peek();
     } // evalRPN()
 
+    // 155. Min Stack
+    // O(1) time for each method
+    // 54/ @ 8ms; 81/ @ 6ms
+    // Should have created my own stack instead of using the built in class.
+    // would have a next instance var in MinStackNode.
+    class MinStack {
+
+        private Stack<MinStackNode> stack;
+
+        public MinStack() {
+            stack = new Stack<MinStackNode>();
+        }
+
+        public void push(int val) {
+            // only pull the current min if the stack is not empty
+            int min = stack.isEmpty() ? val : getMin();
+            MinStackNode newNode = new MinStackNode(val, min);
+            stack.push(newNode);
+        }
+
+        public void pop() {
+            stack.pop();
+        }
+
+        public int top() {
+            return stack.peek().val;
+        }
+
+        public int getMin() {
+            return stack.peek().minVal;
+        }
+    } // class MinStack
+    class MinStackNode {
+        int val;
+        int minVal; // will be the min val at or below this node in the stack
+
+        public MinStackNode(int val, int minVal) {
+            this.val = val;
+            // min is the lesser of the previous min or the new val
+            this.minVal = Math.min(minVal, val);
+        } // MinStackNode()
+    } // class MinStackNode
+
     // 169. Majority Element
     //
     public int majorityElement0(int[] nums) {
@@ -801,6 +877,37 @@ public class Grind75 {
         } // for
         return maj;
     } // majortyElement()
+
+    // 200. Number of Islands
+    // O(n)/O(n) stack memory O(1) write memory
+    // 75/100 @4ms; 38/75 @ 6ms;
+    public int numIslands(char[][] grid) {
+        int islands = 0;
+        // go through each section in the grid
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[0].length; c++) {
+                // if land is found, increment islands and delete the island
+                // if deleted, the island cannot be double counted
+                if (grid[r][c] == '1') {
+                    islands++;
+                    deleteIsland(grid, r, c);
+                } // if
+            } // for c
+        } // for r
+        return islands;
+    } // numIslands()
+    // recursively deletes an entire island (all surrounding 1s)
+    private void deleteIsland(char[][] grid, int r, int c) {
+        // bounds check
+        if (r < 0 || r >= grid.length) return;
+        if (c < 0 || c >= grid[r].length) return;
+        if (grid[r][c] == '0') return; // if not land
+        grid[r][c] = '0'; // delete the land
+        // delete all of the surrounding land
+        int[] dir = {0, 1, 0, -1, 0};
+        for (int i = 1; i < dir.length; i++)
+            deleteIsland(grid, r + dir[i - 1], c + dir[i]);
+    } // deleteIsland();
 
     // 206. Reverse Linked List
     // 100/ @ 0ms
@@ -969,24 +1076,77 @@ public class Grind75 {
             return anEnd;
         } // isAnEnd()
     } // class Trie0
-    // TODO
+    // O(n)/O(n): 10/50 @ 107ms; 54/50 @ 57ms;
+    // TODO implement with hashmaps instead of arrays?
     class Trie {
+        class TrieNode {
+            private TrieNode[] children;
+            private boolean end;
+
+            TrieNode() {
+                 children = new TrieNode['z' - 'a' + 1];
+                 end = false;
+            } // TrieNode()
+
+            TrieNode getChild(char ch) {
+                return children[ch - 'a'];
+            } // getChild()
+
+            boolean hasChild(char ch) {
+                return getChild(ch) != null;
+            } // hasChild()
+
+            void makeChild(char ch) {
+                if (hasChild(ch)) return;
+                children[ch - 'a'] = new TrieNode();
+            } // makeChild()
+
+            boolean isEnd() {
+                return end;
+            } // isEnd()
+
+            void setEnd() {
+                end = true;
+            } // setEnd()
+        } // class TrieNode
+        
+        private TrieNode root;
 
         public Trie() {
-
-        }
+            root = new TrieNode();
+        } //Trie()
 
         public void insert(String word) {
-
-        }
+            TrieNode cur = root;
+            char ch;
+            for (int i = 0; i < word.length(); i++) {
+                ch = word.charAt(i);
+                cur.makeChild(ch);
+                cur = cur.getChild(ch);
+            } // for
+            cur.setEnd();
+        } // insert()
 
         public boolean search(String word) {
-
-        }
+            return find(word, true);
+        } // search()
 
         public boolean startsWith(String prefix) {
+            return find(prefix, false);
+        } // startsWith()
 
-        }
+        private boolean find(String s, boolean lookingForWord) {
+            TrieNode cur = root;
+            char ch;
+            for (int i = 0; i < s.length(); i++) {
+                ch = s.charAt(i);
+                if (!cur.hasChild(ch)) return false;
+                cur = cur.getChild(ch);
+            } // for
+            // the loop completes if every letter was found
+            // either not looking for a word or check if it's an end
+            return (!lookingForWord || cur.isEnd());
+        } // find()
     } // class Trie
 
     // 217. Contains Duplicate
