@@ -207,6 +207,47 @@ public class Grind75 {
         return res.next;
     } // mergeTwoLists()
 
+    // 33. Search in Rotated Sorted Array
+    // 76/56 @ 1ms;
+    // O(logn)/ : do a binary search to find a region without a rotation
+    // then do a binary search for the target
+    // TODO implement iteratively
+    public int search(int[] nums, int target) {
+        int l = 0;
+        int r = nums.length - 1;
+        return search(nums, l, r, target); - 1
+    } // search()
+    // search recursively for a non rotated region
+    // once found, look for the target with normal BS
+    private int search(int[] nums, int l, int r, int target) {
+        if (nums[l] > nums[r]) { // there is a rotation in bounds
+            int m = (l + r) / 2;
+            // search the left and right regions
+            int leftRegion = search(nums, l, m, target);
+            int rightRegion = search(nums, m + 1, r, target);
+            // return the non -1 res if it exists
+            return leftRegion == -1 ? rightRegion : leftRegion; 
+        } else { // there is not a rotation in bounds
+            return regularBinarySearch(nums, l, r, target);
+        } // if
+    } // search()
+    private int regularBinarySearch(int[] nums, int l, int r, int target) {
+        int m = (l + r) / 2;
+        while (l < r) {
+            if (nums[m] == target) break;
+            if (target < nums[m]) r = m - 1;
+            else l = m + 1;
+            m = (l + r) / 2;
+        } // while
+        // if the target is found, return index, else -1
+        return nums[m] == target ? m : -1;
+    } // regularBinarySearch()
+
+    // 39. Combination Sum
+    //
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+    } // combinationSum()
+
     // 53. Maximum Subarray
     // 10/78 @ 4ms; 
     public int maxSubArray(int[] nums) {
@@ -1345,8 +1386,49 @@ public class Grind75 {
     } // firstBadVersion()
 
     // 322. Coin Change
-    // TODO
+    // O(n)/O(n) 87/69 @ 19ms;
+    // using tabulation
     public int coinChange(int[] coins, int amount) {
+        if (amount == 0) return 0;
+        Arrays.sort(coins);
+        int[] tab = new int[amount + 1];
+        for (int coin : coins)
+            if (coin <= amount) tab[coin] = 1;
+        for (int amt = 1; amt < tab.length; amt++) {
+            for (int i = coins.length - 1; i >= 0; i--)
+                if (coins[i] < amt)
+                    if (tab[amt - coins[i]] != 0)
+                        if (tab[amt] == 0) tab[amt] = tab[amt - coins[i]] + 1;
+                        else tab[amt] = Math.min(1 + tab[amt - coins[i]], tab[amt]);
+            // if tab[amt] is still 0 here, change is not possible
+            if (tab[amt] == 0) tab[amt] = -1;
+        } // for amt
+        return tab[amount] == 0 ? -1 : tab[amount];
+    } // coinChange()
+    // using memoization
+    // not working, may need a Math.min to fix it
+    public int coinChange(int[] coins, int amount) {
+        Arrays.sort(coins);
+        Map<Integer, Integer> memo = new HashMap<>();
+        memo.put(0, 0);
+        return coinChange(coins, amount, memo);
+    } // coinChange()
+    private int coinChange(int[] coins, int amount, Map<Integer, Integer> memo) {
+        System.out.printf("checking amount: %d\n", amount);
+        if (memo.containsKey(amount)) return memo.get(amount);
+        for (int i = coins.length - 1; i >= 0; i--) {
+            // want to start with the largest coin less than amount
+            if (coins[i] > amount) continue;
+            // if there is no way to make change for that amount
+            if (coinChange(coins, amount - coins[i], memo) == -1) continue;
+            // else a valid way to make change was found
+            memo.put(amount, 1 + coinChange(coins, amount - coins[i], memo));
+            System.out.printf("amount: %d needs: %d\n", amount, memo.get(amount));
+            return memo.get(amount);
+        } // for
+        // if the loop ends and execution gets here, there was no way to make that value
+        memo.put(amount, -1);
+        return -1;
     } // coinChange()
 
     // 338. Counting Bits
@@ -1612,6 +1694,57 @@ public class Grind75 {
     private double eD(int[] p) {
         return distanceEuclidian(p[0], p[1], 0, 0);
     } // eD
+
+    // 994. Rotting Oranges
+    // approach is like BFS
+    // O(n)/O(n)
+    // 46/12 @ 4ms; 76/12 @ 3ms
+    public int orangesRotting(int[][] grid) {
+        Queue<int[]> q = new LinkedList<int[]>();
+        // queue up the rotten oranges
+        queueOranges(grid, q, 2);
+        // now rot the oranges and track how many minutes it takes
+        int minutes = 0;
+        while (!q.isEmpty()) {
+            int batch = q.size(); // rot oranges by batches
+            while (batch > 0) {
+                rotNeighbors(grid, q);
+                batch--;
+            } // while
+            minutes++;
+        } // while
+        if (minutes > 0) minutes--; 
+        // 1 minute will pass with no new rotting happening if oranges have already rotted
+        // all rottable oranges should now be rotted so search for any fresh ones
+        queueOranges(grid, q, 1);
+        // if the q has any elements, there are fresh oranges remaining so return -1
+        return q.isEmpty() ? minutes : -1;
+    } // orangesRotting()
+    private void queueOranges(int[][] grid, Queue<int[]> q, int orangeType) {
+        for (int r = 0; r < grid.length; r++) {
+            for (int c = 0; c < grid[r].length; c++) {
+                if (grid[r][c] == orangeType)
+                    q.offer(new int[]{r, c});
+            } // for c
+        } // for r
+    } // queueOranges()
+    // rot and queue each fresh neighbor of the next orange in the queue
+    private void rotNeighbors(int[][] grid, Queue<int[]> q) {
+        int[] rottenOrange = q.poll();
+        int[] dir = new int[]{0, 1, 0, -1, 0};
+        int[] neighbor;
+        for (int d = 1; d < dir.length; d++) {
+            neighbor = new int[]{ rottenOrange[0] + dir[d - 1],
+                                        rottenOrange[1] + dir[d]};
+            // bounds check then check if it's a fresh orange
+            if (neighbor[0] < 0 || neighbor[0] >= grid.length    ||
+                neighbor[1] < 0 || neighbor[1] >= grid[0].length ||
+                grid[neighbor[0]][neighbor[1]] != 1) continue;
+            // else it is a fresh orange so rot it and add it to the queue
+            grid[neighbor[0]][neighbor[1]] = 2;
+            q.offer(neighbor);
+        } // for
+    } // rotNeighbors()
 
 
 } // class
