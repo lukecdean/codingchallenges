@@ -119,6 +119,41 @@ public class Grind75 {
 
 
     // 15. 3Sum
+    // O(n^2)/O(1)
+    // 65/76 @ 43ms
+    // modes: 1/2
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        Arrays.sort(nums); // sort in order to use Two Sum II approach
+        // go through each value, then use the Two Sum II approach 
+        // to find values that make up the remainder
+        for (int i = 0; i < nums.length; i++) {
+            // skip duplicate values
+            if (i != 0 && nums[i] == nums[i - 1]) continue;
+            int target = 0 - nums[i];
+            int l = i + 1;
+            int r = nums.length - 1;
+            while (l < r) {
+                // skip duplicates at l
+                if (l != i + 1 && nums[l] == nums[l - 1]) l++;
+                // don't need to check r since ptrs are moved in on sum found
+                // now check if the ptrs sum to the target
+                else if (nums[l] + nums[r] == target) {
+                    List<Integer> triplet = new ArrayList<Integer>(3);
+                    triplet.add(nums[i]);
+                    triplet.add(nums[l]);
+                    triplet.add(nums[r]);
+                    res.add(triplet);
+                    l++;
+                    r--;
+                }
+                // lastly moving the ptrs based on sum being over or under
+                else if (nums[l] + nums[r] < target) l++;
+                else r--;
+            } // while
+        } // for i
+        return res;
+    } // threeSum()
     // this has become an absolute disaster
     public List<List<Integer>> threeSum0(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
@@ -244,9 +279,101 @@ public class Grind75 {
     } // regularBinarySearch()
 
     // 39. Combination Sum
-    //
+    // backtracing
+    // O()/O(1)
+    // 61/24 @ 6ms
+    // modes: 1/2
     public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        ArrayList<Integer> l = new ArrayList<Integer>();
+        backtrace(candidates, target, 0, res, l);
+        return res;
+    } // combinationSum();
+    private boolean backtrace(int[] candidates, int target, int start, List<List<Integer>> res, ArrayList<Integer> l) {
+        int sum = 0;
+        for (Integer num : l) sum += num;
+        // if sum is <= then no need to look further indicated by returning true
+        if (target <= sum) {
+            // if ==, add the list of ints to the res
+            if (target == sum) res.add((List<Integer>)l.clone());
+            return true;
+        } // if
+        for (int i = start; i < candidates.length && candidates[i] <= target - sum; i++) {
+            l.add(candidates[i]);
+            if (backtrace(candidates, target, i, res, l)) {
+                l.remove(l.size() - 1);
+                return false;
+            } // if
+            l.remove(l.size() - 1);
+        } // for i
+        return false;
+    } // backtrace()
+    // could work but I realized I could just use backtracing
+    public List<List<Integer>> combinationSum0(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        // get a list of all combinations that add to each int <= target
+        Map<Integer, List<List<Integer>>> map = new HashMap<>();
+        // initialize a list for each num <= target
+        for (int i = 1; i <= target; i++) {
+            List<List<Integer>> l = new ArrayList<List<Integer>>();
+            map.put(i, l);
+        } // for i
+        int rightBound = candidates.length;
+        // each candidate <= target gets a list where it's the only value
+        // mark where the the candidates <= target stop
+        for (int i = 0; i < rightBound; i++) {
+            if (candidates[i] > target) {
+                rightBound = i;
+                break;
+            } // if
+            List<Integer> l = new ArrayList<Integer>();
+            l.add(candidates[i]);
+            map.get(candidates[i]).add(l);
+        } // for
     } // combinationSum()
+
+    // 46. Permutations
+    // O(n!)/O(n!)
+    // 13/25 @ 5ms on the tail end of the time normal curve/on the right curve of the bimodal distribution
+    // Should try implementing with backtracing next time TODO
+    public List<List<Integer>> permute(int[] nums) {
+        int elements = nums.length;
+        // create the two lists which will be used to build up the result
+        List<List<Integer>> la = new ArrayList<List<Integer>>(1);
+        List<Integer> starterL = new ArrayList<>(1);
+        starterL.add(nums[0]);
+        la.add(0, starterL);
+        List<List<Integer>> lb;
+        // for each element in elements
+        for (int element = 1; element < elements; element++) {
+            int laLists = la.size();
+            int lbLists = laLists * (laLists + 1);
+            lb = new ArrayList<List<Integer>>(lbLists);
+            int lbListSize = la.get(0).size() + 1;
+            // each position in the new list (lb) that element can be
+            for (int insertIndex = 0; insertIndex < lbListSize; insertIndex++) {
+                // must go through each list in previous list (la)
+                for (List<Integer> list : la) {
+                    List<Integer> newList = new ArrayList<>(lbListSize);
+                    // need to copy elements from la to lb and insert the new element at insertIndex
+                    int posList = 0;
+                    for (int posNewList = 0; posNewList < lbListSize; posNewList++) {
+                        if (posNewList == insertIndex) {
+                            newList.add(posNewList, nums[element]);
+                        } else {
+                            newList.add(posNewList, list.get(posList));
+                            posList++;
+                        } // if
+                    } // for pesNewList
+                    lb.add(newList);
+                } // for each list in la
+            } // for posB
+            // reassign lb to la to repeat the loop
+            la = lb;
+        } // for element
+        return la;
+    } // permute()
 
     // 53. Maximum Subarray
     // 10/78 @ 4ms; 
@@ -288,6 +415,124 @@ public class Grind75 {
         } // for
         return max;
     } // maxSubArray()
+
+    // 56. Merge K Intervals
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals, (int[] a, int[] b) -> a[0] > b[0] ? 1 : -1);
+        int cur = 0;
+        for (int i = 1; i < intervals.length; i++) {
+            if (intervals[i][0] <= intervals[cur][1]) {
+                intervals[cur][1] = Math.max(intervals[cur][1], intervals[i][1]);
+            } else { // ivls not overlapping
+                cur++;
+                intervals[cur] = intervals[i];
+            } // if
+        } // for
+        int[][] res = new int[cur + 1][];
+        for (int c = 0; c < res.length; c++) res[c] = intervals[c];
+        return res;
+    } // merge()
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals, (int[] a, int[] b) -> a[0] < b[0] ? 1 : -1);
+        List<Integer[]> res = new ArrayList<Integer[]>();
+        addIntToInteger(res, intervals[0]);
+        for (int i = 1; i < intervals.length; i++) {
+            // if an ivl overlaps with the previous, combine them
+            if (intervals[i][0] <= res.get(res.size() - 1)[1])
+                res.get(res.size() - 1)[1] = Math.max(intervals[i][1], res.get(res.size() - 1)[1]);
+            // else add the ivl to the list
+            else addIntToInteger(intervals[i]);
+        } // for i
+        int[][] resArr = new int[res.size()][];
+        res.toArray(resArr);
+        return resArr;
+    } // merge()
+    private void addIntToInteger(List<Integer[]> l, int[] arr) {
+        Integer[] newarr = new Integer[2];
+        newarr[0] = arr[0];
+        newarr[1] = arr[1];
+        l.add(newarr);
+    } // addIntToInteger()
+    // O(n)/O(n) doesn't work
+    public int[][] merge(int[][] intervals) {
+        // create an int arr which holds flags for if a time is a start, end, or interior
+        // 000-1111-1000 0 not in ivl, -1 a start/end of an ivl, and 1 an interior
+        int end = 0; // the final end time in the intervals which is arr size
+        for (int[] ivl : intervals) end = Math.max(end, ivl[1]);
+        int[] times = new int[end + 1];
+        // give each time the proper flag
+        for (int[] ivl : intervals) {
+            if (times[ivl[0]] != 1) times[ivl[0]] = -1;
+            if (times[ivl[1]] != 1) times[ivl[1]] = -1;
+            for (int t = ivl[0] + 1; t < ivl[1]; t++) times[t] = 1;
+        } // for ivl
+        // if a -1 is surrounded by 1, it is an end that is now contained
+        for (int t = 2; t < times.length - 2; t++) {
+            if (times[t] == -1 && times[t - 1] == 1 && times[t + 1] == 1)
+                times[t] = 1;
+        } // for
+        // find how many ivls there are
+        boolean inIvl = false;
+        int ivlCt = 0;
+        for (int t = 0; t < times.length; t++) {
+            if (times[t] == -1) {
+                if (inIvl == false)
+                    ivlCt++;
+                inIvl = !inIvl;
+            } // if
+        } // for t
+        int[][] res = new int[ivlCt][2];
+        inIvl = false;
+        int curIvl = 0;
+        for (int t = 0; t < times.length; t++) {
+            if (times[t] == -1) {
+                if (inIvl == false) {
+                    res[curIvl][0] = t;
+                } else { // inIvl == true
+                    res[curIvl][1] = t;
+                    curIvl++;
+                } // if
+                inIvl = !inIvl;
+            }
+        } // for t
+        return res;
+    } // merge()
+    // O(n)/O(n)
+    public int[][] merge(int[][] intervals) {
+        //Arrays.sort(intervals, (int[] a, int[] b) -> a[0] < b[0]);
+        // create a boolean list that stores t or f for each unit of time
+        List<Boolean> times = new ArrayList<Boolean>();
+        for (int[] ivl : intervals) {
+            while (times.size() <= ivl[1]) times.add(false);
+            for (int t = ivl[0]; t <= ivl[1]; t++) times.set(t, true);
+        } // for ivl
+        int ivlCt = 0;
+        boolean inIvl = false;
+        for (int i = 0; i < times.size(); i++) {
+            if (inIvl == false && times.get(i) == true) {
+                inIvl = true;
+                ivlCt++;
+            } else if (times.get(i) == false) {
+                inIvl = false;
+            } // if
+        } // for i
+        int[][] res = new int[ivlCt][2];
+        int curIvl = 0;
+        inIvl = false;
+        for (int i = 0; i < times.size(); i++) {
+            if (inIvl == false && times.get(i) == true) {
+                inIvl = true;
+                res[curIvl][0] = i;
+            } else if (inIvl == true && times.get(i) == false) {
+                inIvl = false;
+                res[curIvl][1] = i - 1;
+                curIvl++;
+            } // if
+        } // for i
+        // if loop ends inside an ivl, need to set the final ivl's end
+        if (inIvl == true) res[curIvl][1] = times.size() - 1;
+        return res;
+    } // merge()
 
     // 57. Insert Inteval
     // O(n)/O(n) 45/77 @ 3ms; 
@@ -853,9 +1098,25 @@ public class Grind75 {
         } // MinStackNode()
     } // class MinStackNode
 
+    // 167. Two Sum II - Input Array Is Sorted
+    // O(n)/O(1)
+    // 81/81 @ 2ms
+    public int[] twoSum(int[] numbers, int target) {
+        int[] ptrs = new int[]{1, numbers.length};
+        int sum = numbers[ptrs[0] - 1] + numbers[ptrs[1] - 1];
+        // two pointers. if the sum is too great, move the left ptr inward
+        // else if the sum is too low, move the right pointer inward
+        while (sum != target) {
+            if (sum < target) ptrs[0]++;
+            else ptrs[1]--;
+            sum = numbers[ptrs[0] - 1] + numbers[ptrs[1] - 1];
+        } // while
+        return ptrs;
+    } // twoSum()
+
     // 169. Majority Element
     //
-    public int majorityElement0(int[] nums) {
+    public int majorityElement0(int[] rums) {
         int[][] cts = new int[2][2];
         int currentnum = nums[0];
         int currentct = 0;
