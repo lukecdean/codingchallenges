@@ -395,30 +395,16 @@ public class Grind75 {
                 count += nums[i];
                 max = max > count ? max : count;
             } // if
-
-            /*
-            // if adding the next num to the count is a net negative
-            // move past the current subarray
-            if (count + nums[i] < 0) {
-                // check if the value of the single num is a greater value
-                max = Math.max(max, nums[i]);
-                count = 0;
-            } else if (count + nums[i] == 0) {
-                count = nums[i];
-                max = Math.max(max, nums[i]);
-            } else {
-                // if it is still a net positive to add the next num, add it and compare
-                count += nums[i];
-                max = Math.max(max, count);
-            } // if
-            */
         } // for
         return max;
     } // maxSubArray()
 
     // 56. Merge K Intervals
+    // O(nlogn)/O(n)
+    // 83/44 @ 11ms
+    // modes: 2/2
     public int[][] merge(int[][] intervals) {
-        Arrays.sort(intervals, (int[] a, int[] b) -> a[0] > b[0] ? 1 : -1);
+        Arrays.sort(intervals, (int[] a, int[] b) -> a[0] - b[0]);
         int cur = 0;
         for (int i = 1; i < intervals.length; i++) {
             if (intervals[i][0] <= intervals[cur][1]) {
@@ -675,6 +661,51 @@ public class Grind75 {
         } // for
         return ways;
     } // climbStairs()
+
+    // 75. Sort Colors
+    // O(2n)/O(1)
+    // 100/72
+    // Should generalize to k colors and be no more than O(k*n)
+    public void sortColors(int[] nums) {
+        // sort the first two colors. The third must be sorted afterward
+        int[] colors = new int[]{0, 1};
+        int colorPointer = 0; // where the next target color should be swapped to
+        // ie the index of the first non target color in nums
+        int temp;
+        for (int color : colors) {
+            for (int i = colorPointer; i < nums.length; i++) {
+                if (nums[i] == color) {
+                    // swap with colorPointer if they are not the same index
+                    if (i != colorPointer) {
+                        temp = nums[colorPointer];
+                        nums[colorPointer] = nums[i];
+                        nums[i] = temp;
+                    } // if
+                    colorPointer++;
+                }
+            } // for i
+        } // for color
+    } // sortColors()
+    // sigle pass solution inspired by leetcode discussion post
+    public void sortColors(int[] nums) {
+        int red = 0;
+        int white = 0;
+        int blue = nums.length - 1;
+        while (white <= blue) {
+            if (nums[white] == 0) { // red
+                nums[white] = nums[red];
+                nums[red] = 0;
+                white++;
+                red++;
+            } else if (nums[white] == 1) { // white
+                white++;
+            } else { // blue
+                nums[white] = nums[blue];
+                nums[blue] = 2;
+                blue--;
+            } // if
+        } // while
+    } // sortColors()
 
     // 98. Validate Binary Search Tree
     // O(n)/ : 100/ @ 0ms
@@ -941,6 +972,76 @@ public class Grind75 {
             clone.neighbors.add(cloneGraphR(neighbor, map));
         return clone;
     } // cloneGraphR()
+
+    // 139. Word Break
+    //
+    public boolean wordBreak(String s, List<String> wordDict) {
+        /*
+        // remove any words that are not in s
+        for (int w = 0; w < wordDict.size(); w++) {
+            if (!s.contains(wordDict.get(w))) {
+                wordDict.remove(w);
+                w--; // to not skip a word
+            } // if
+        } // for
+        */
+        // ensure each letter in s can be found in wordDict
+        boolean[] lettersInS = new boolean[26];
+        for (int i = 0; i < s.length(); i++)
+            lettersInS[s.charAt(i) - 'a'] = true;
+        boolean[] lettersInWordDict = new boolean[26];
+        for (String word : wordDict)
+            for (int i = 0; i < word.length(); i++)
+                lettersInWordDict[word.charAt(i) - 'a'] = true;
+        for (int i = 0; i < lettersInS.length; i++)
+            if (lettersInS[i] == true && lettersInWordDict[i] != true)
+                return false;
+        // add each word from wordDict to a list mapped to the letter it starts with
+        Map<Character, List<String>> words = new HashMap<>();
+        for (String word : wordDict) {
+            if (!words.containsKey(word.charAt(0)))
+                words.put(word.charAt(0), new ArrayList<String>());
+            words.get(word.charAt(0)).add(word);
+        } // for word
+        // sort the strings in order of descending height for potentially less computation
+        for (int i = 0; i < 26; i++)
+            if (words.containsKey(i + 'a'))
+                words.get(i + 'a').sort((String a, String b) -> Integer.compare(b.length(), a.length()));
+        return backTrace(s, 0, words);
+    } // wordBreak()
+    private boolean backTrace(String s, int start, Map<Character, List<String>> words) {
+        char startingChar = s.charAt(start);
+        // make sure there are words that start with startingChar
+        if (!words.containsKey(startingChar)) return false;
+        for (String word : words.get(startingChar)) {
+            // see if/where the current word fills to
+            int fillsToRes = fillsTo(s, start, word);
+            // if it fills
+            if (fillsToRes != -1) {
+                // if it fills to the end of the word, the answer is true
+                if (fillsToRes == s.length() - 1)
+                    return true;
+                // else see if the next portion of s can be filled
+                boolean btres = backTrace(s, fillsToRes + 1, words);
+                if (btres == true)
+                    return true;
+            } // if
+        } // for word
+        // if could not fill, return false
+        return false;
+    } // backTrace()
+    // if w is found in s starting at start, returns index it fills to, else -1
+    private int fillsTo(String s, int start, String w) {
+        // can skip the first index since this only gets called with
+        // strings that begin with the same char
+        int si = start;
+        for (int wi = 1; wi < w.length(); wi++) {
+            si++;
+            if (si >= s.length() || s.charAt(si) != w.charAt(wi))
+                return -1;
+        } // for i
+        return si;
+    } // fillsTo()
 
     // 141. Linked List Cycle
     // 100/40,67 @ 0ms; 
@@ -1509,6 +1610,97 @@ public class Grind75 {
         } // while
     } // flip()
 
+    // 236. Lowest Common Ancestor of a Binary Tree
+    // 69/27 @ 9ms; 21/18 @ 15ms
+    // only traverses through the tree a single time
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode[] lca = new TreeNode[1]; // bootleg pointer
+        findLCA(root, p.val, q.val, lca);
+        return lca[0];
+    } // lowestCommonAncestor()
+    // boolean[0] is ancestor of p, boolean[1] is ancestor of q
+    private boolean[] findLCA(TreeNode root, int p, int q, TreeNode[] lca) {
+        boolean[] b = new boolean[]{false, false};
+        // lca has been found already or the root is null
+        if      (lca[0] != null || root == null) return b; 
+        // if the root as a target node, mark the proper boolean
+        else if (root.val == p) b[0] = true;
+        else if (root.val == q) b[1] = true;
+        // search for the next target node
+        boolean[] l = findLCA(root.left, p, q, lca);
+        boolean[] r = findLCA(root.right, p, q, lca);
+        // is ancestor if it is the node or the right or left is an ancestor
+        b[0] = b[0] || l[0] || r[0]; 
+        b[1] = b[1] || l[1] || r[1];
+        // if it is an ancestor of both, set the lca
+        if (b[0] == true && b[1] == true) {
+            lca[0] = root;
+            // clear booleans so no higher ancestors overwrite the lca
+            b[0] = false;
+            b[1] = false;
+        } // if
+        return b;
+    } // findLCA()
+    // this is the soln above before lca became a "pointer"
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode lca = null;
+        findLCA(root, p.val, q.val, lca);
+        return lca;
+    } // lowestCommonAncestor()
+    // boolean[0] is ancestor of p, boolean[1] is ancestor of q
+    private boolean[] findLCA(TreeNode root, int p, int q, TreeNode lca) {
+        boolean[] b = new boolean[]{false, false};
+        // lca has been found already or the root is null
+        if      (lca != null || root == null) return b; 
+        else if (root.val == p) b[0] = true;
+        else if (root.val == q) b[1] = true;
+        boolean[] l = findLCA(root.left, p, q, lca);
+        boolean[] r = findLCA(root.right, p, q, lca);
+        // is ancestor if it is the node or the right or left is an ancestor
+        b[0] = b[0] || l[0] || r[0]; 
+        b[1] = b[1] || l[1] || r[1];
+        // if it is an ancestor of both, set the lca
+        if (b[0] == true && b[1] == true) lca = root;
+        return b;
+    } // findLCA()
+    // O(n)/O(n)
+    // 37/87 @ 12ms 
+    // two dfs to find ancestry and a bfs to find the common
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // first a DFS to find all of the ancestors of p and q
+        Set<Integer> pAncestors = new HashSet<>();
+        Set<Integer> qAncestors = new HashSet<>();
+        hasDescendant(root, p, pAncestors);
+        hasDescendant(root, q, qAncestors);
+        // then a BFS to find the lowest root with both descendants
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        TreeNode lca = root;
+        while (!queue.isEmpty()) {
+            if (t == null) continue;
+            TreeNode t = queue.poll();
+            if (pAncestors.contains(t.val) && qAncestors.contains(t.val))
+                lca = t;
+            queue.offer(t.left);
+            queue.offer(t.right);
+        } // while
+        return lca;
+    } // lowestCommonAncestor()
+    // DFS to see if a node has the given descendant
+    private boolean hasDescendant(TreeNode root, TreeNode d, Set<Integer> dAncestor) {
+        if (root == null) return false;
+        else if (root.val == d.val) {
+            dAncestor.add(root.val);
+            return true;
+        } else {
+            boolean hasDescendant = 
+                hasDescendant(root.left, d, dAncestor) ||
+                hasDescendant(root.right, d, dAncestor);
+            if (hasDescendant) dAncestor.add(root.val);
+            return hasDescendant;
+        } // if
+    } // hasDescendant()
+
     // 235. Lowest Common Ancestor of a Binary Search Tree
     // 34/32 @ 9ms; 48/ @ 8ms; 
     public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
@@ -1814,6 +2006,105 @@ public class Grind75 {
         return -1;
     } // search()
 
+    // 721. Accounts Merge
+    // TODO
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        // associate each email in the accounts with an account
+        Map<String, Integer> map = new HashMap<>();
+        Map<Integer, Set<Integer>> graph = new HashMap<>();
+        // initialize every edge
+        for (int a = 0; a < accounts.size(); a++)
+            graph.put(a, new HashSet<Integer>());
+        for (int accountInt = 0; accountInt < accounts.size(); accountInt++) {
+            List<String> account = accounts.get(accountInt);
+            for (int emailInt = 1; account.size(); emailInt++) {
+                String email =  account.get(emailInt);
+                if (map.containsKey(email) { // email is mapped to an account
+                    // if it's mapped to the same account, it's a dupe so remove it
+                    if (map.get(email) == accountInt) {
+                        account.remove(emailInt);
+                        emailInt--; // so as not to skip an email
+                    } else { // the email is part of another account
+                        graph.get(map.get(email)).add(accountInt);
+                        graph.get(accountInt).add(map.get(email));
+                        // make edges between both associated nodes
+                    } // if
+                } else { // email is not mapped to an account
+                    map.put(email, accountInt);
+                } // if
+            } // for emailInt
+        } // for account
+        // now all dupe emails should be removed and accounts should be connected
+        // 
+        boolean[] seen = new boolean[accounts.size()];
+        for (account = 0; account < accounts.size(); account++) {
+            mergeAccounts(graph, seen, account, account);
+        } // for account
+    } // accountsMerge()
+    private void mergeAccounts(Map<Integer, Set<Integer>> graph, boolean[] seen, int main, int subNode) {
+        if (seen[subNode]) return;
+        seen[subNode] = true;
+        Integer[] neighbors = new Integer[graph.get(subNode).size()];
+        graph.get(subNode).toArray(neighbors);
+        for (Integer neighbor : neighbors) {
+            graph.get(main).add(neighbor);
+            mergeAccounts(graph, seen, main, neighbor);
+        } // for neighbor
+    } // mergeAccounts()
+
+    // attempt 0; a linear approach that fails to account for later assc between accounts
+    // count work if the entire function ran in a loop but would be O(n^2)
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        Map<String, Integer> map = new HashMap<>();
+        for (int acct = 0; acct < accounts.size(); acct++) {
+            for (int e = 1; e < accounts.get(acct).size(); e++) {
+                String email = accounts.get(acct).get(e);
+                // check if the email is already associated with an acct
+                if (map.containsKey(email)) {
+                    if (map.get(email) == acct) {
+                        // if the email is a dublicate within the account
+                        accounts.get(acct).remove(e);
+                        e--;
+                    } else { // if the email is associated with a different account
+                        // merge the two accounts
+                        int mergeTo = map.get(email);
+                        mergeAccounts(mergeTo, acct, accounts, map);
+                        accounts.remove(acct); // then remove the extra account
+                        acct--; // need to decrement the current acct number since one was removed
+                        break; // since this account is accounted for
+                    } // if
+                } else { // email has not been associated with an account
+                    map.put(email, acct); // associate it
+                } // if
+            } // for email
+        } // for acct
+        // all accounts should now be merged, so it is time to sort them
+        // remove the name from the list, sort it, and reenter the name
+        for (List<String> account : accounts) {
+            String name = account.remove(0);
+            account.sort((String a, String b) -> a.compareToIgnoreCase(b));
+            account.add(0, name);
+        } // for account
+        return accounts;
+    } // accountsMerge()
+
+    // merges 2 accounts ie adds the emails from mergeFrom to mergeTo
+    private void mergeAccounts(int mergeTo, int mergeFrom, List<List<String>> accounts, Map<String, Integer> map) {
+        List<String> mergeToAcct = accounts.get(mergeTo);
+        List<String> mergeFromAcct = accounts.get(mergeFrom);
+        for (int email = 1; email < mergeFromAcct.size(); email++) {
+            // first, check if the email is already in mergeTo
+            String emailStr = mergeFromAcct.get(email);
+            if (    map.containsKey(emailStr) && 
+                    map.get(emailStr) == mergeTo) {
+               continue;
+            } else { // else add it to mergeTo and associate it
+                mergeToAcct.add(mergeFromAcct.get(email));
+                map.put(mergeFromAcct.get(email), mergeTo);
+            } // if
+        } // for email
+    } // mergeAccounts()
+
     // 733. Flood Fill
     //
     public int[][] floodFill(int[][] image, int sr, int sc, int color) {
@@ -1956,6 +2247,22 @@ public class Grind75 {
         return distanceEuclidian(p[0], p[1], 0, 0);
     } // eD
 
+    // 981. Time Based Key-Value Store
+    // TODO
+    class TimeMap {
+
+        public TimeMap() {
+
+        } // TimeMap()
+
+        public void set(String key, String value, int timestamp) {
+
+        } // set(k,v,t)
+
+        public String get(String key, int timestamp) {
+
+        } // get(k,t) 
+    } // TimeMap()
     // 994. Rotting Oranges
     // approach is like BFS
     // O(n)/O(n)
