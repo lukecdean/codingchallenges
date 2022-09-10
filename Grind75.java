@@ -67,6 +67,54 @@ public class Grind75 {
         return max;
     } // lengthOfLongstSubstring()
 
+    // 8. String to Integer (atoi)
+    //
+    public int myAtoi(String s) {
+        // trim whitespace and determine sign
+        s = s.trim();
+        int sign = 1;
+        if (s.charAt(0) == '-')
+            sign = -1;
+        if (s.charAt(0) == '-' || s.charAt(0) == '+')
+            s = s.substring(1);
+        // add the following digits from right to left to a stack
+        // the digit on top of the stack will be the 1s place
+        // the next digit will be the 10s place and etc
+        Stack<Integer> digits = new Stack<>();
+        int sptr = 0;
+        int decimal = decimalValue(s.charAt(sptr));
+        while (decimal != -1 && sptr < s.length()) {
+            digits.push(decimal);
+            sptr++;
+            decimal = decimalValue(s.charAt(sptr));
+        } // while
+        int sum = 0;
+        int place = 0;
+        while (!digits.isEmpty()) {
+            int nextValue = digits.pop() * (Math.pow(10, place));
+            // check if the value needs to be clamped
+            // if it gets to MAX_VALUE and the sign is positive, need to clamp
+            // if sign is negative, then the value could still be one greater
+            if (nextValue == (Integer.MAX_VALUE - sum) && sign == 1)
+                return Integer.MAX_VALUE;
+            // if the sum will overflow or if the nextValue has overflown
+            else if (nextValue > (Integer.MAX_VALUE - sum) || nextValue < 0)
+                return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            else
+                sum += nextValue;
+            place++;
+        } // while
+        return sum;
+    } // myAtoi()
+    // returns decimal value of char or -1 if not a digit
+    private int decimalValue(char c) {
+        int d = c - '0';
+        // ASCII char values
+        if (c < 0 || 9 < c)
+            return -1; // not a digit
+        return d;
+    } // decimalValue()
+
     // 13. Roman to Integer
     // 71/61 @ 7ms; 94/64 @ 5ms
     public int romanToInt0(String s) {
@@ -122,7 +170,7 @@ public class Grind75 {
     // O(n^2)/O(1)
     // 65/76 @ 43ms
     // modes: 1/2
-    public List<List<Integer>> threeSum(int[] nums) {
+    public List<List<Integer>> threeSum(int[] num) {
         List<List<Integer>> res = new ArrayList<List<Integer>>();
         Arrays.sort(nums); // sort in order to use Two Sum II approach
         // go through each value, then use the Two Sum II approach 
@@ -1928,6 +1976,11 @@ public class Grind75 {
         } // for c
         return count;
     } // longestPalindrome()
+
+    // 416. Partition Equal Subset Sum
+    //
+    public boolean canPartition(int[] nums) {
+    } // canPartition()
 
     // 543. Diameter of a Binary Tree
     // 65/7 @ 1ms;
