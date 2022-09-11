@@ -79,7 +79,7 @@ public class Grind75 {
             s = s.substring(1);
         // add the following digits from right to left to a stack
         // the digit on top of the stack will be the 1s place
-        // the next digit will be the 10s place and etc
+        // the next digit will be the 10s place and etc.
         Stack<Integer> digits = new Stack<>();
         int sptr = 0;
         int decimal = decimalValue(s.charAt(sptr));
