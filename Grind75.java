@@ -68,7 +68,7 @@ public class Grind75 {
     } // lengthOfLongstSubstring()
 
     // 8. String to Integer (atoi)
-    //
+    // TODO - this can be done much better
     public int myAtoi(String s) {
         // trim whitespace and determine sign
         s = s.trim();
@@ -969,8 +969,29 @@ public class Grind75 {
     } // maxProfit()
 
     // 121. Valid Palindrome
+    // 99/98
+    public boolean isPalindrome1(String s) {
+        s = s.toLowerCase();
+        int b = 0; // beginning pointer
+        int e = s.length() - 1; // ending pointer
+        while (b <= e) {
+            // find the next letter or digit
+            while (b <= e && !isLetterOrDigit(s.charAt(b)))
+                b++;
+            while (e >= b && !isLetterOrDigit(s.charAt(e)))
+                e--;
+            // ensure they are the same
+            if (s.charAt(b) != s.charAt(e))
+                return false;
+            b++;
+            e--;
+        } // while
+        // if no mimatches were found, it is an anagram
+        return true;
+    } // isPalindrome()
+
     // 78/70 @ 5 ms
-    public boolean isPalindrome(String s) {
+    public boolean isPalindrome0(String s) {
         s = s.toLowerCase();
         // two pointer approach
         int b = -1;
@@ -1027,10 +1048,10 @@ public class Grind75 {
         /*
         // remove any words that are not in s
         for (int w = 0; w < wordDict.size(); w++) {
-            if (!s.contains(wordDict.get(w))) {
-                wordDict.remove(w);
-                w--; // to not skip a word
-            } // if
+        if (!s.contains(wordDict.get(w))) {
+        wordDict.remove(w);
+        w--; // to not skip a word
+        } // if
         } // for
         */
         // ensure each letter in s can be found in wordDict
@@ -1816,6 +1837,8 @@ public class Grind75 {
             // add to index of letter from s; subtract from t
             counts['z' - s.charAt(i)]++;
             counts['z' - t.charAt(i)]--;
+            //count[s.charAt(i) - 'a'];
+            //count[s.charAt(i) - 'a'];
         } // for
         // check that all letters were canceled out
         for (int c : counts) {
@@ -1980,7 +2003,62 @@ public class Grind75 {
     // 416. Partition Equal Subset Sum
     //
     public boolean canPartition(int[] nums) {
+        // get the total sum of the array
+        int sum = 0;
+        for (int n : nums) sum += n;
+        // if odd, it can't be split
+        if ((sum % 2) == 1) return false;
+        // get half of the total sum which will be the target to add up to
+        int target = sum / 2;
+
     } // canPartition()
+    public boolean canPartition0(int[] nums) {
+        // get the total sum of the array
+        int sum = 0;
+        for (int n : nums) sum += n;
+        // if odd, it can't be split
+        if ((sum % 2) == 1) return false;
+        // get half of the total sum which will be the target to add up to
+        int target = sum / 2;
+        return backtrack(nums, 0, target);
+    } // canPartition()
+    // if the target can be subtracted from to be exactly 0,
+    // then there are numbers which can sum to the target
+    private boolean backtrack(int[] nums, int start, int target) {
+        if (target == 0) return true;
+        if (target < 0 || start >= nums.length) return false;
+        for (int i = start; i < nums.length; i++) {
+            target -= nums[i]; 
+            if (backtrack(nums, i + 1, target)) return true;
+            target += nums[i];
+        } // for i
+        return false;
+    } // backtrack()
+    public boolean canPartition1(int[] nums) {
+        // get the total sum of the array
+        int sum = 0;
+        for (int n : nums) sum += n;
+        // if odd, it can't be split
+        if ((sum % 2) == 1) return false;
+        // get half of the total sum which will be the target to add up to
+        int target = sum / 2;
+        Arrays.sort(nums);
+        return backtrack(nums, 0, target);
+    } // canPartition()
+    private boolean backtrack(int[] nums, int start, int target) {
+        if (target == 0) return true; // partition has been found
+        if (start >= nums.length) return false; // out of bounds start
+        // backtrack
+        for (int i = start; i < nums.length; i++) {
+            target -= nums[i];
+            if (target < 0) return false; // since sorted, can exit early
+            if (backtrack(nums, i + 1, target)) return true;
+            target += nums[i];
+        } // for i
+        return false;
+    } // backtrack()
+
+
 
     // 543. Diameter of a Binary Tree
     // 65/7 @ 1ms;
