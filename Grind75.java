@@ -447,6 +447,120 @@ public class Grind75 {
         return max;
     } // maxSubArray()
 
+    // 54. Spiral Matrix
+    // O(n)/O(1)
+    // 100/95 @ 0ms
+    public List<Integer> spiralOrder(int[][] matrix) {
+        // create walls which the 'snake' cannot pass
+        // these walls will close in as the snake gathers numbers
+        int redge = matrix[0].length;
+        int bedge = matrix.length;
+        int ledge = -1;
+        int tedge = -1;
+        int[] pos = new int[]{0,-1}; // [row, col] position, head of the snake
+        // start it to the left of the top left cell
+        List<Integer> res = new ArrayList<>(redge * bedge);
+        int[][] dirs = new int[][]{{0, 1},{1, 0},{0, -1},{-1, 0}};
+        //                         right, down,  left,   up
+        while (!isTrapped(pos, redge, bedge, ledge, tedge)) {
+            // traveling along a wall moves that wall inward
+            // ex. moving right (across the top wall) means the top wall must move inward
+            traverse(res, matrix, pos, dirs[0], redge, bedge, ledge, tedge); // traverse right
+            tedge++;
+            traverse(res, matrix, pos, dirs[1], redge, bedge, ledge, tedge); // traverse down
+            redge--;
+            traverse(res, matrix, pos, dirs[2], redge, bedge, ledge, tedge); // traverse left
+            bedge--;
+            traverse(res, matrix, pos, dirs[3], redge, bedge, ledge, tedge); // traverse up
+            ledge++;
+        } // while
+        return res;
+    } // spiralOrder()
+    private void traverse(List<Integer> res, int[][] matrix, int[] pos, int[] dir, int redge, int bedge, int ledge, int tedge) {
+        pos[0] += dir[0];
+        pos[1] += dir[1];
+        while (isReachable(pos, redge, bedge, ledge, tedge)) {
+            res.add(matrix[pos[0]][pos[1]]);
+            pos[0] += dir[0];
+            pos[1] += dir[1];
+        } // while
+        // don't overshoot
+        pos[0] -= dir[0];
+        pos[1] -= dir[1];
+    } // traverse()
+    private boolean isReachable(int[] pos, int redge, int bedge, int ledge, int tedge) {
+        return (ledge < pos[1] && pos[1] < redge &&
+                tedge < pos[0] && pos[0] < bedge);
+    } // isReachable()
+    private boolean isTrapped(int[] pos, int redge, int bedge, int ledge, int tedge) {
+        int[] dirs = new int[]{0, 1, 0, -1, 0};
+        // check if any adjacent cells are reachable
+        for (int i = 1; i < dirs.length; i++) {
+            pos[0] += dirs[i];
+            pos[1] += dirs[i - 1];
+            if (isReachable(pos, redge, bedge, ledge, tedge)) {
+                pos[0] -= dirs[i];
+                pos[1] -= dirs[i - 1];
+                return false;
+            } // if
+            pos[0] -= dirs[i];
+            pos[1] -= dirs[i - 1];
+        } // for i
+        // if none were found, return false
+        return true;
+    } // isTrapped()
+
+    public List<Integer> spiralOrder(int[][] matrix) {
+        // create walls which the 'snake' cannot pass
+        // these walls will close in as the snake gathers numbers
+        int redge = matrix[0].length;
+        int bedge = matrix.length;
+        int ledge = -1;
+        int tedge = -1;
+        int[] pos = new int[]{0,-1}; // [row, col] position, head of the snake
+        List<Integer> res = new ArrayList<>(redge * bedge);
+        while (!trapped(pos, redge, bedge, ledge, tedge)) {
+            // traveling along a wall moves that wall inward
+            // ex. moving right (across the top wall) means the top wall must move inward
+            traverse(res, matrix, pos, 1, redge, false); // traverse right
+            tedge++;
+            traverse(res, matrix, pos, 1, bedge, true); // traverse down
+            redge--;
+            traverse(res, matrix, pos, -1, ledge, false); // traverse left
+            bedge--;
+            traverse(res, matrix, pos, -1, tedge, true); // traverse up
+            ledge++;
+        } // while
+        return res;
+    } // spiralOrder()
+    // if there is no open path
+    private boolean trapped(int[] pos, int redge, int bedge, int ledge, int tedge) {
+        // check if there is a direction which can be taken
+        return (pos[1] + 1 >= redge && pos[0] + 1 >= bedge &&
+                pos[1] - 1 <= ledge && pos[0] - 1 <= tedge);
+    } // trapped()
+    private void traverse(List<Integer> res, int[][] matrix, int[] pos, int step, int edge, boolean verticalDir) {
+        if (verticalDir) {
+            int nextPos = pos[0] + step;
+            // may use the same boolean expression to check less than if it's multiplied by step
+            // because a negative step (meaning it's traversing to a cell with a lower number) 
+            // means it really should be greater than
+            // the wall/edge it's heading towards. Similar to an absolute value.
+            while (step * nextPos < step * edge) {
+                res.add(matrix[nextPos][pos[1]]);
+                nextPos += step;
+            } // while
+            pos[0] = nextPos - step;
+        } else {
+            int nextPos = pos[1] + step;
+            while (step * nextPos < step * edge) {
+                res.add(matrix[pos[0]][nextPos]);
+                nextPos += step;
+            } // while
+            pos[1] = nextPos - step;
+        } // if
+    } // traverse()
+
     // 56. Merge K Intervals
     // O(nlogn)/O(n)
     // 83/44 @ 11ms
@@ -1043,7 +1157,38 @@ public class Grind75 {
     } // cloneGraphR()
 
     // 139. Word Break
-    //
+    // O(n^2)/O(n)
+    // 84/98 @ 5ms
+    public boolean wordBreak(String s, List<String> wordDict) {
+        // will be going through s starting at the end to see if a words can fill it
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[s.length()] = true; // if s can be filled the its length, dp should be true
+        for (int i = s.length() - 1; i >= 0; i--) {
+            for (String word : wordDict) {
+                if (fills(s, i, word)) {
+                    dp[i] = dp[i] || dp[i + word.length()];
+                } // if fills
+                if (dp[i] == true) {
+                    continue;
+                } // if
+            } // for word
+        } // for i
+        return dp[0];
+    } // wordBreak()
+    // checks if a word fills string s starting at char b to b + length of word
+    private boolean fills(String s, int b, String word) {
+        // check that each char in word matches each char in s starting at b
+        for (int i = 0; i < word.length(); i++) {
+            if (b >= s.length()) { // i.e. if word is too long
+                return false;
+            } else if (word.charAt(i) != s.charAt(b)) { // if mismatch
+                return false;
+            } // if
+            b++;
+        } // for 
+        // if no mismatches and not too long, it does fill
+        return true;
+    } // fills()
     public boolean wordBreak(String s, List<String> wordDict) {
         /*
         // remove any words that are not in s
