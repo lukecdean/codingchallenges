@@ -869,6 +869,33 @@ public class Grind75 {
         } // while
     } // sortColors()
 
+    // 78. Subsets
+    // O(n!)/O(n!)
+    // 41/69 @ 2ms
+    public List<List<Integer>> subsets(int[] nums) {
+        List<Integer> lst = new ArrayList<>(nums.length);
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        backtrack(nums, 0, res, lst);
+        return res;
+    } // subsets()
+    private void backtrack(int[] nums, int cur, List<List<Integer>> res, List<Integer> lst) {
+        if (cur >= nums.length) {
+            res.add(cloneList(lst)); // clone lst into res
+            return;
+        } // if
+        lst.add(nums[cur]); // add cur num
+        backtrack(nums, cur + 1, res, lst); // backtrack with cur num
+        lst.remove(lst.size() - 1); // remove cur num
+        backtrack(nums, cur + 1, res, lst); // backtrack without cur num
+    } // backtrack()
+    private <E> List<E> cloneList(List<E> lst) {
+        List<E> cln = new ArrayList<E>(lst.size());
+        for (E e : lst) {
+            cln.add(e);
+        } // for e
+        return cln;
+    } // cloneList()
+
     // 98. Validate Binary Search Tree
     // O(n)/ : 100/ @ 0ms
     // The key concept was found but it can be done with much less code. TODO
