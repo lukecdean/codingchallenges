@@ -68,7 +68,46 @@ public class Grind75 {
     } // lengthOfLongstSubstring()
 
     // 5. Longest Palindromic Substring
-    // O(n^2)/O(1)
+    // O(n^2)/O(n^2) 
+    // 37/25 @ 137ms;
+    // I could do this with 2n space instead of n^2
+    public String longestPalindrome(String s) {
+        int[] longestPalindrome = new int[]{0, 1};
+        // will store true if from bgn to end indeces in s is a palindrome
+        // pldrm[bgn][end]
+        boolean[][] dp = new boolean[s.length()][s.length()];
+        // fill the diagonal with true since all single chars are palindromes
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][i] = true;
+        } // for i
+        // check for all pairs of duplicate chars since they are also palindromes
+        for (int i = 1; i < s.length(); i++) {
+            if (s.charAt(i - 1) == s.charAt(i)) {
+                dp[i - 1][i] = true;
+                // update the longest found substring as it's found
+                longestPalindrome[0] = i - 1;
+                longestPalindrome[1] = i;
+            } // if
+        } // for i
+        // now travel down the daigonals up/right of dp
+        // start on the 3rd diagonal since all palindromes up to length 2 have been found
+        for (int diagonal = 2; diagonal < dp.length; diagonal++) { // the diagonal being checked
+            for (int i = 0; i < dp.length - diagonal; i++) {
+                // first check if [bgn + 1][end - 1] is a palindrome
+                if (dp[i + 1][i + diagonal - 1] == true) {
+                    // if it is, check if the new bgn and end chars match, if they do, it's a palindrome
+                    if (s.charAt(i) == s.charAt(i + diagonal)) {
+                        dp[i][i + diagonal] = true;
+                        // update the longest found substring as it's found
+                        longestPalindrome[0] = i;
+                        longestPalindrome[1] = i + diagonal;
+                    } // if
+                } // if
+            } // for i
+        } // for diagonal
+        return s.substring(longestPalindrome[0], longestPalindrome[1] + 1);
+    } // longestPalindrome()
+    // O(n^3)/O(1)
     // 15/98 @ 488ms
     public String longestPalindrome(String s) {
         // search for  largest possible palindrome size then shrink it until one is found
