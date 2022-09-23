@@ -67,6 +67,41 @@ public class Grind75 {
         return max;
     } // lengthOfLongstSubstring()
 
+    // 5. Longest Palindromic Substring
+    // O(n^2)/O(1)
+    // 15/98 @ 488ms
+    public String longestPalindrome(String s) {
+        // search for  largest possible palindrome size then shrink it until one is found
+        for (int size = s.length(); size > 0; size--) {
+            // makes a window that is shifted over one char after each check
+            // ptrs to the indeces being checked over
+            int bgn = 0;
+            int end = size - 1;
+            // checks every substring of each size
+            while (end < s.length()) {
+                if (isPalindrome(s, bgn, end)) {
+                    return s.substring(bgn, end + 1);
+                } // if
+                bgn++;
+                end++;
+            } // while
+        } // for size
+        // if no palindrome was found the first char as a string 
+        return s.substring(0, 1);
+    } // longestPalindrome()
+    // checks for a palindrome at the substring bgn, end inclusive
+    private boolean isPalindrome(String s, int bgn, int end) {
+        while (bgn < end) {
+            if (s.charAt(bgn) != s.charAt(end)) {
+                return false;
+            } // if
+            bgn++;
+            end--;
+        } // while
+        // if no mismatches were found
+        return true;
+    } // isPalindrome()
+
     // 8. String to Integer (atoi)
     // TODO - this can be done much better
     public int myAtoi(String s) {
@@ -1521,6 +1556,35 @@ public class Grind75 {
         } // for
         return maj;
     } // majortyElement()
+
+    // 199. Binary Tree Right Side View
+    // O(n)/O(n)
+    // 95/90 @ 1ms; 49/15 @ 2ms 
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> res = new LinkedList<>();
+        // BFS
+        Deque<TreeNode> deq = new LinkedList<>();
+        if (root != null) {
+            deq.addLast(root);
+        } // if
+        while (!deq.isEmpty()) {
+            // BFS one layer at a time
+            int size = deq.size();
+            // the last node in the deque at each layer is the one seen from the right
+            res.add(deq.getLast().val); 
+            while (size > 0) {
+                TreeNode tnd = deq.removeFirst();
+                size--;
+                if (tnd.left != null) {
+                    deq.addLast(tnd.left);
+                } // if
+                if (tnd.right != null) {
+                    deq.addLast(tnd.right);
+                } // if
+            } // while
+        } // while
+        return res;
+    } // rightSideView()
 
     // 200. Number of Islands
     // O(n)/O(n) stack memory O(1) write memory
