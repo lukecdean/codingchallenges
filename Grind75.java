@@ -841,6 +841,31 @@ public class Grind75 {
         return newIntervals;
     } // iIWO()
 
+    // 62. Unique Paths
+    // O(mn)/O(n)
+    // 56/81 @ 1ms
+    // DP
+    public int uniquePaths(int m, int n) {
+        // the number of paths is the number of paths rightward plus
+        // the numbor of paths downward
+        // only need to know the most recent row's values so only need a 1D array
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1); // the bottom row only has a single path
+        for (int row = m - 2; row >= 0; row--) { // already accounted for the bottom row
+            for (int col = n - 2; col >= 0; col--) { // the last index will always be 1
+                dp[col] = dp[col] + dp[col + 1]; // rightward + downward
+            } // for col
+        } // while row
+        return dp[0];
+    } // uniquePaths()
+    // O(n)/O(1)
+    // Mathematically
+    public int uniquePaths(int m, int n) {
+        int movesRequired = m - 1 + n - 1;
+        // movesRequired pick m or n
+        return nChooseK(movesRequired, m);
+    } // uniquePaths()
+
     // 67. Add Binary
     // 36/ @ 5ms
     public String addBinary(String a, String b) {
