@@ -1153,6 +1153,32 @@ public class Grind75 {
         return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));
     } // maxDepth()
 
+    // 105. Construct Binary Tree from Preorder and Inorder Traversal
+    //
+    // preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+    //                      3
+    //                  9       20
+    //                        15  7
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        TreeNode root = new TreeNode();
+        buildTree(preorder, inorder, root, 0, preorder.length - 1);
+        return root;
+    } // buildTree()
+    // recursively builds the tree
+    private void buildTree(int[] preorder, int[] inorder, TreeNode root, int start, int end) {
+        // the first val in preorder is the root so everything to its left in inorder is the left subtree
+        root.val = preorder[start];
+        // find the root val index in inorder
+        int rootInInorder = -1;
+        for (int i = start; i < end; i++)
+            if (inorder[i] == preorder[start])
+                rootInInorder = i;
+        if (rootInInOrder != start) { // there are nodes in the left subtree
+            TreeNode leftRoot = new TreeNode();
+            buildTree(preorder, inorder, leftRoot, 
+        }
+    } // buildTree()
+
     // 110. Balanced Binary Tree
     //
     public boolean isBalanced0(TreeNode root) {

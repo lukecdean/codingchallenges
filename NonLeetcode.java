@@ -48,5 +48,10 @@ class NonLeetcode {
         return turn * val;
     } // value()
 
+
+    // Good q to ask: how many words and do they fit in memory?
+    public int wordsWithPrefix(String prefix) {
+       
+    } // wordsWithPrefix()
 } // Class
 
