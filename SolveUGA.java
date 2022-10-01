@@ -157,6 +157,7 @@ class SolveUGA {
                 boolean op2Related = map.containsKey(op2);
                 if (
 
+                        // how to do this with constant time...
 
                 //boolean op2Related = rel[op2 - 'a'] != '0';
                 //boolean op1Related = rel[op1 - 'a'] != '0';
