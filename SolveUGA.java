@@ -144,5 +144,31 @@ class SolveUGA {
         } // while
         return ct;
     } // bfs()
+    // 9-30-2022
+    public boolean equationsPossible(String[] equations) {
+        //char[] rel = new char[26];
+        Map<Character, Character> map = new HashMap<>();
+        //Arrays.fill(rel, '0');
+        for (String eqn : aquations) {
+            if (eqn.charAt(1) == '=') {
+                char op1 = eqn.charAt(0);
+                char op2 = eqn.charAt(3);
+                boolean op1Related = map.containsKey(op1);
+                boolean op2Related = map.containsKey(op2);
+                if (
+
+
+                //boolean op2Related = rel[op2 - 'a'] != '0';
+                //boolean op1Related = rel[op1 - 'a'] != '0';
+                //boolean op2Related = rel[op2 - 'a'] != '0';
+                // if neither has been related, start a new family
+                //if (op1Related == false && op1Related == false) {
+                    //rel[op1 - 'a'] = op1;
+                //} // if
+            } // if
+        } // for eqn
+    } // equationsPossible()
+
+
 } // class
 

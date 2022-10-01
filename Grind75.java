@@ -191,6 +191,29 @@ public class Grind75 {
         return d;
     } // decimalValue()
 
+    // 11. Container With Most Water
+    // O(n)/O(1)
+    // 15/18 @ 14ms
+    public int maxArea(int[] height) {
+        int bgn = 0;
+        int end = height.length - 1;
+        int max = (end - bgn) * Math.min(height[bgn], height[end]);
+        while (bgn < end) {
+            if (height[bgn] < height[end]) {
+                int hgt = height[bgn];
+                bgn++;
+                while (bgn < end && height[bgn] < hgt) bgn++;
+            } else {
+                int hgt = height[end];
+                end--;
+                while (bgn < end && height[end] < hgt) end--;
+            } // if
+            int newTank = (end - bgn) * Math.min(height[bgn], height[end]);
+            max = Math.max(max, newTank); 
+        } // while
+        return max;
+    } // maxArea()
+
     // 13. Roman to Integer
     // 71/61 @ 7ms; 94/64 @ 5ms
     public int romanToInt0(String s) {
@@ -340,6 +363,11 @@ public class Grind75 {
         } // for
         list.add(newList);
     } // tripleExists()
+
+    // 17. Letter Combinations of a Phone Number
+    //
+    public List<String> letterCombinations(String digits) {
+    } // letterCombinations()
 
     // 21. Merge Two Sorted Lists
     // 80/29
