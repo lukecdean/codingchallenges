@@ -367,7 +367,73 @@ public class Grind75 {
     // 17. Letter Combinations of a Phone Number
     //
     public List<String> letterCombinations(String digits) {
+        List<String> res = new List<>(digits.length * 3.25);
+        StringBuilder bdr = new StringBuilder();
+        backtrack(digits, 0, bdr, res);
+        return res;
     } // letterCombinations()
+    private void backtrack(String digits, int i, StringBuilder bdr, List<String> res) {
+        // a combination has been completed
+        if (i == digits.length) { 
+            res.add(bdr.build());
+        } // if
+        // performs the backtracking
+        for (char c : getMappings(digits.charAt(i))) {
+            bdr.add(c);
+            backtrack(digits, i + 1, bdr, res);
+            bdr.remove(c);
+        } // for c
+    } // backtrack()
+    private List<Character> getMappings(char c) {
+        List<Character> map = new List<>(4);
+        switch (c) {
+            case '2': 
+                map.addAll('a', 'b', 'c');
+                break;
+            case '3': 
+                map.addAll('d', 'e', 'f');
+                break;
+            case '4': 
+                map.addAll('g', 'h', 'i');
+                break;
+            case '5': 
+                map.addAll('j', 'k', 'l');
+                break;
+            case '6': 
+                map.addAll('m', 'n', 'o');
+                break;
+            case '7': 
+                map.addAll('p', 'q', 'r', 's');
+                break;
+            case '8': 
+                map.addAll('t', 'u', 'v');
+                break;
+            case '9': 
+                map.addAll('w', 'x', 'y', 'z');
+                break;
+        } // switch
+        return map;
+    } // getMappings()
+    private List<Character> getMappings(char c) {
+        int num = Character.parseInt(c); // the int val of c
+        int letters = 3; // how many letters that number maps to
+        // 7 has four letters so the following numbers are offset 1 more the usual multiples of 3
+        int offset = 0; 
+        if (num == 7 || num == 9) { // 7 and 9 map to four letters each
+            letters = 4;
+        } // if
+        if (num == 8 || num == 9) { // 8 and 9 map to letters one after their multiples of 3
+            offset = 1;
+        } // if
+        // starting letter (ASCII value)
+        int startingLetter = num * 3 + offset + 'a';
+        int endeingLetter = startingLetter + letters;
+        List<Character> mappings = new LinkedList<>();
+        for (int letter = startingLetter; letter < endingLetter; letter++) {
+            mappings.add((char)letter);
+        } // for letter
+        return mappings;
+    } // getMappings()
 
     // 21. Merge Two Sorted Lists
     // 80/29
@@ -1205,6 +1271,18 @@ public class Grind75 {
             TreeNode leftRoot = new TreeNode();
             buildTree(preorder, inorder, leftRoot, 
         }
+    } // buildTree()
+    public TreeNode buildTree1(int[] preorder, int[] inorder) {
+        // build a hashmap to store the indeces of the nodes for the inorder array
+        Map<Integer, Integer> inorderIndeces = new HashMap<>();
+        for (int i : inorder) {
+            inorderIndeces.put(inorder[i], i);
+        } // for i
+        // the first node in preorder is the parent node of the tree
+        // everything to its left in inorder is part of the left subtree
+        TreeNode root = new TreeNode(inorder[0]);
+    } // buildTree()
+    private int buildTree(int[] preorder, int[] inorder, Map<Integer, Integer> inorderIndeces, int bgn, int end, TreeNode root) {
     } // buildTree()
 
     // 110. Balanced Binary Tree
