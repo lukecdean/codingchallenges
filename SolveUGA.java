@@ -267,6 +267,44 @@ class SolveUGA {
         } // for c
     } // collapseSets()
 
+    // 10-05-2022
+    // 36. Valid Sudoku
+    public boolean isValidSudoku(char[][] board) {
+        Set<Character> set = new HashSet<>();
+        // check each row
+        for (int r = 0; r < board.length; r++) {
+            set.clear();
+            for (int c = 0; c < board[0].length; c++) {
+                if (Character.isDigit(board[r][c]) && set.add(board[r][c]) == false) {
+                    return false;
+                } // if
+            } // for c
+        } // for r
+        // check each col
+        for (int c = 0; c < board[0].length; c++) {
+            set.clear();
+            for (int r = 0; r < board.length; r++) {
+                if (Character.isDigit(board[r][c]) && set.add(board[r][c]) == false) {
+                    return false;
+                } // if
+            } // for c
+        } // for r
+        // check each 3x3
+        for (int gridr = 0; gridr < 3; gridr++) {
+            for (int gridc = 0; gridc < 3; gridc++) {
+                set.clear();
+                for (int r = gridr * 3; r < gridr * 3 + 3; r++) {
+                    for (int c = gridc * 3; c < gridc * 3 + 3; c++) {
+                        if (Character.isDigit(board[r][c]) && set.add(board[r][c]) == false) {
+                            return false;
+                        } // if
+                    } // for c
+                } // for r
+            } // for gridc
+        } // for gridr
+        return true;
+    } // isValidSudoku()
+
 
 } // class
 

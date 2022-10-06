@@ -365,23 +365,28 @@ public class Grind75 {
     } // tripleExists()
 
     // 17. Letter Combinations of a Phone Number
-    //
+    // O(n!)/O(1)
+    // 67/60 @ 2ms; 51/20 @ 3ms
     public List<String> letterCombinations(String digits) {
-        List<String> res = new List<>(digits.length * 3.25);
+        List<String> res = new ArrayList<>((int)(digits.length() * 3.25));
+        if (digits.length() == 0) {
+            return res;
+        } // if
         StringBuilder bdr = new StringBuilder();
         backtrack(digits, 0, bdr, res);
         return res;
     } // letterCombinations()
     private void backtrack(String digits, int i, StringBuilder bdr, List<String> res) {
         // a combination has been completed
-        if (i == digits.length) { 
-            res.add(bdr.build());
+        if (i == digits.length()) { 
+            res.add(bdr.substring(0));
+            return;
         } // if
         // performs the backtracking
         for (char c : getMappings(digits.charAt(i))) {
-            bdr.add(c);
+            bdr.append(c);
             backtrack(digits, i + 1, bdr, res);
-            bdr.remove(c);
+            bdr.delete(bdr.length() - 1);
         } // for c
     } // backtrack()
     private List<Character> getMappings(char c) {
@@ -415,7 +420,7 @@ public class Grind75 {
         return map;
     } // getMappings()
     private List<Character> getMappings(char c) {
-        int num = Character.parseInt(c); // the int val of c
+        int num = Character.getNumericValue(c); // the int val of c
         int letters = 3; // how many letters that number maps to
         // 7 has four letters so the following numbers are offset 1 more the usual multiples of 3
         int offset = 0; 
@@ -427,7 +432,7 @@ public class Grind75 {
         } // if
         // starting letter (ASCII value)
         int startingLetter = num * 3 + offset + 'a';
-        int endeingLetter = startingLetter + letters;
+        int endingLetter = startingLetter + letters;
         List<Character> mappings = new LinkedList<>();
         for (int letter = startingLetter; letter < endingLetter; letter++) {
             mappings.add((char)letter);
@@ -1281,8 +1286,11 @@ public class Grind75 {
         // the first node in preorder is the parent node of the tree
         // everything to its left in inorder is part of the left subtree
         TreeNode root = new TreeNode(inorder[0]);
+        buildTree(preorder, inorder, inorderIndeces, 0, inorder.length, root);
+        return root;
     } // buildTree()
     private int buildTree(int[] preorder, int[] inorder, Map<Integer, Integer> inorderIndeces, int bgn, int end, TreeNode root) {
+        if (end - bgn < 
     } // buildTree()
 
     // 110. Balanced Binary Tree
