@@ -1096,6 +1096,57 @@ public class Grind75 {
         return cln;
     } // cloneList()
 
+    // 79. Word Search
+    // 41/47 @ 205ms; 13/18 @ 376ms
+    public boolean exist(char[][] board, String word) {
+        char firstChar = word.charAt(0);
+        char lastChar = word.charAt(word.length() - 1);
+        for (int r = 0; r < board.length; r++) {
+            for (int c = 0; c < board[0].length; c++) {
+                if (board[r][c] == firstChar) {
+                    if (searchWord(board, r, c, word, 0) == true) {
+                        return true;
+                    } // if
+                } // if
+            } // for c
+        } // for r
+        return false;
+    } // exist()
+    private boolean searchWord(char[][] board, int r, int c, String word, int index) {
+        // check if this is a valid square
+        if (validSquare(board, r, c) == false) {
+            return false;
+        } else if (board[r][c] != word.charAt(index)) { // chars don't match
+            return false;
+        } else { // chars match
+            // check base case, end of the word found
+            if (index == word.length() - 1) {
+                return true;
+            } // if
+        } // if
+        // temporarily remove the char being searched so it's not searched again
+        char temp = board[r][c];
+        board[r][c] = '0'; // marks the space as searched
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        // check in all four directions
+        for (int dir = 1; dir < dirs.length; dir++) {
+            int nextR = r + dirs[dir];
+            int nextC = c + dirs[dir - 1];
+            if (searchWord(board, nextR, nextC, word, index + 1) == true) {
+                return true;
+            } // if
+        } // for dir
+        // if the next char was not found, replace the char in the board and return
+        board[r][c] = temp;
+        return false;
+    } // searchWord()
+    private boolean validSquare(char[][] board, int r, int c) {
+        // checks bounds and then if the space has not been visited
+        return (0 <= r && r < board.length &&
+                0 <= c && c < board[0].length &&
+                board[r][c] != '0');
+    } // validSquare()
+
     // 98. Validate Binary Search Tree
     // O(n)/ : 100/ @ 0ms
     // The key concept was found but it can be done with much less code. TODO
@@ -1285,12 +1336,15 @@ public class Grind75 {
         } // for i
         // the first node in preorder is the parent node of the tree
         // everything to its left in inorder is part of the left subtree
-        TreeNode root = new TreeNode(inorder[0]);
+        TreeNode root = new TreeNode(preorder[0]);
         buildTree(preorder, inorder, inorderIndeces, 0, inorder.length, root);
         return root;
     } // buildTree()
     private int buildTree(int[] preorder, int[] inorder, Map<Integer, Integer> inorderIndeces, int bgn, int end, TreeNode root) {
-        if (end - bgn < 
+        if (end - bgn == 1) {
+            TreeNode l = new TreeNode(indorder[end]);
+            root.left = l;
+        } // if 
     } // buildTree()
 
     // 110. Balanced Binary Tree
