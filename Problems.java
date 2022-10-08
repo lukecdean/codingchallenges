@@ -516,6 +516,111 @@ class Problems {
         } // for
         return res;
     } // getSum()
+    // 450. Delete Node in a BST
+    // 100/79 @ 0m;
+    public TreeNode deleteNode(TreeNode root, int key) {
+        TreeNode tempRoot = new TreeNode(Integer.MAX_VALUE);
+        tempRoot.left = root;
+        TreeNode parent = tempRoot;
+        TreeNode child = root;
+        boolean leftward = true;
+        // look for the node with the key
+        while (child != null && child.val != key) {
+            parent = child;
+            if (key < child.val) { // key is leftward
+                leftward = true;
+                child = child.left;
+            } else { // key is rightward
+                leftward = false;
+                child = child.right;
+            } // if
+        } // while
+        if (child == null) { // key not found
+            return tempRoot.left;
+        } // if
+        // else the node with the key exists and is pointed to by child so delete child
+        // find child's predecessor
+        if (child.left == null) { // no predecessor
+            if (leftward) {
+                parent.left = child.right;
+            } else {
+                parent.right = child.right;
+            } // if
+        } else if (child.left.right == null) { // immediate left child is predecessor
+            TreeNode pred = child.left;
+            pred.right = child.right;
+            if (leftward) {
+                parent.left = pred;
+            } else {
+                parent.right = pred;
+            } // if
+        } else { // predecessor is right of the left child
+            TreeNode predParent = child.left;
+            TreeNode pred = predParent.right;
+            // traverse down to the predecessor
+            while (pred.right != null) {
+                predParent = pred;
+                pred = pred.right;
+            } // while
+            // remove pred
+            predParent.right = pred.left; // assign its only child to its parent
+            pred.left = null; // remove its only child
+            pred.left = child.left; // give pred the node to remove's children
+            pred.right = child.right;
+            // now replace child with pred
+            if (leftward) {
+                parent.left = pred;
+            } else {
+                parent.right = pred;
+            } // if
+        } // if
+        return tempRoot.left;
+    } // dN()
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (key == root.val) {
+            if (root.left == null) { // no predecessor
+                root = root.right();
+                return root;
+            } else { // there is a predecessor
+                if (root.left.right == null) { // predecessor is root's left child
+                    root.left.right = root.right;
+                    root = root.left;
+                } else { // predecessor is not immediate left child
+                    TreeNode parent = root.left;
+                    TreeNode child = parent.right;
+                    while (child.right != null) {
+                        parent = child;
+                        child = child.right;
+                    } // while
+                    // child will point to the predecessor after this for loop
+                    // parent's right child will be the predecessor
+                    parent.right = child.left;
+                    child.left = null;
+                    child.left = root.left;
+                    child.right = root.right;
+                    root = child;
+                } // if
+            } // if
+        } else { // the node to remove is not the root
+        } // if
+    } // deleteNode()
+    private void removePredecessor(TreeNode parent, TreeNode child) {
+    } // removePredecessor()
+
+    private void removePredecessor(TreeNode nodeParent, TreeNode node) {
+        if (node.left == null) { // no predecessor
+            nodeParent.left = null;
+        } else if (node.left.right == null) { // the left child is the predecessor
+            node.left.right = node.right;
+            node = node.left;
+        } // if
+        TreeNode parent = node;
+        TreeNode child = parent.left;
+        while (child.right != null) {
+            parent = child;
+            child = child.right;
+        } // while
+    } // findPredecessor()
 
     // 572. Subtree of Another Tree
     public boolean isSubtree(TreeNode root, TreeNode subRoot) {
