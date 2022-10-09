@@ -2556,6 +2556,36 @@ public class Grind75 {
 
 
 
+    // 438. Find All Anagrams in a String
+    //
+    // sliding window
+    public List<Integer> findAnagrams(String s, String p) {
+        Map<Character, Integer> letters = new HashMap<>();
+        for (int c = 0; c < p.length(); c++) {
+            char letter = p.charAt(i);
+            if (!letters.containsKey(letter)) {
+                letters.put(letter, 1);
+            } else {
+                letters.put(letter, letters.get(letter) + 1);
+            } // if
+        } // for i
+        int ct = 0;
+        for (int i = 0; i < p.length(); i++) {
+            if (letters.containsKey(s.charAt(i)) {
+                ct++;
+            } // if
+        } // for
+        for (int i = p.length() - 1; i < s.length() - p.length(); i++) {
+            if (ct == p.length()) { // have enough letters for a palindrome
+                if (isAnagram(s, p, i)) {
+                    res.add(i - p.length() + 1);
+                } // if
+            } // if
+        } // for i
+    } // findAnagrams()
+    private boolean isAnagram(String s, String p, int i, Map<Character, Integer> letters) {
+    } // if
+
     // 543. Diameter of a Binary Tree
     // 65/7 @ 1ms;
     public int diameterOfBinaryTree(TreeNode root) {
