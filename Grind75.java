@@ -2584,7 +2584,7 @@ public class Grind75 {
         } // for i
     } // findAnagrams()
     private boolean isAnagram(String s, String p, int i, Map<Character, Integer> letters) {
-    } // if
+    } // isAnagram()
 
     // 543. Diameter of a Binary Tree
     // 65/7 @ 1ms;
