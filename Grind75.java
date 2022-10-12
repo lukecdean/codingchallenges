@@ -2560,6 +2560,34 @@ public class Grind75 {
     //
     // sliding window
     public List<Integer> findAnagrams(String s, String p) {
+        int bgn = 0;
+        int end = 0;
+        List<Integer> res = new LinkedList<>();
+        Map<Character, Integer> letters = new HashMap<>();
+        for (int i = 0; i < p.length(); i++) {
+            letters.put(p.charAt(i), letters.getOrDefault(p.charAt(i), 0));
+        } // for i
+        int count = letters.size();
+        while (end < s.length()) {
+            char chr = s.charAt(end);
+            letters.put(chr, letters.get(chr) - 1);
+            if (letters.get(chr) == 0) {
+                count--;
+            } // if
+
+            if (count == 0) {
+                res.add(bgn);
+                letters.put(chr, letters.get(chr) + 1);
+                if (letters.get(chr) == 1) {
+                    count++;
+                } // if
+                bgn++;
+            } // while
+        } // while
+        return res;
+    } // findAnagrams()
+
+    public List<Integer> findAnagrams(String s, String p) {
         Map<Character, Integer> letters = new HashMap<>();
         for (int c = 0; c < p.length(); c++) {
             char letter = p.charAt(i);
@@ -2582,6 +2610,7 @@ public class Grind75 {
                 } // if
             } // if
         } // for i
+    } // findAnagrams()
     } // findAnagrams()
     private boolean isAnagram(String s, String p, int i, Map<Character, Integer> letters) {
     } // isAnagram()
