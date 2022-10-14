@@ -2575,6 +2575,7 @@ public class Grind75 {
                 count--;
             } // if
 
+
             if (count == 0) {
                 res.add(bgn);
                 letters.put(chr, letters.get(chr) + 1);
