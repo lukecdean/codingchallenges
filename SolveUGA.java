@@ -305,6 +305,10 @@ class SolveUGA {
         return true;
     } // isValidSudoku()
 
+    // 10-12-2022
+    // no meeting
+    // 10-14-2022
+    // no meeting
 
 } // class
 
