@@ -2405,6 +2405,38 @@ public class Grind75 {
         return mid;
     } // firstBadVersion()
 
+    // 310. Minimum Height Trees
+    //
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        Map<Integer, List<Integer>> tree = new HashMap<>();
+        // build the tree
+        for (int e = 0; e < edges.length; e++) {
+            if (!tree.containsKey(edges[0])) {
+                List<Integer> neighbors = new ArrayList<>();
+                tree.put(edges[0], neighbors);
+            } // if
+            tree.get(edges[0]).add(edges[1]);
+            if (!tree.containsKey(edges[1])) {
+                List<Integer> neighbors = new ArrayList<>();
+                tree.put(edges[1], neighbors);
+            } // if
+            tree.get(edges[1]).add(edges[0]);
+        } // for e
+        int[] heights = new int[n];
+        Arrays.fill(heights, Integer.MAX_VALUE);
+        for (int node = 0; node < n; node++) {
+            dfs(tree, node, heights);
+        } // for e
+    } // findMinHeightTrees()
+    private int dfs(Map<Integer, List<Integer>> tree, int node, int[] heights) {
+        int min = Integer.MAX_VALUE;
+        for (int neighbor : tree.get(node)) {
+            min = Math.min(min, 1 + dfs(tree, neighbor, heights));
+        } // for neighbor
+        heights[node] = Math.min(min, heights[node]);
+        return min;
+    } // dfs()
+
     // 322. Coin Change
     // O(n)/O(n) 87/69 @ 19ms;
     // using tabulation
@@ -2557,30 +2589,42 @@ public class Grind75 {
 
 
     // 438. Find All Anagrams in a String
-    //
+    // O(n)/O(m)
+    // 48/35 @ 35ms
     // sliding window
     public List<Integer> findAnagrams(String s, String p) {
+        // the ends of the window
         int bgn = 0;
         int end = 0;
         List<Integer> res = new LinkedList<>();
+        // map to store how many of each letter are in p
         Map<Character, Integer> letters = new HashMap<>();
-        for (int i = 0; i < p.length(); i++) {
+        for (int i = 0; i < p.length(); i++) { // add them up
             letters.put(p.charAt(i), letters.getOrDefault(p.charAt(i), 0));
         } // for i
+        // count is how many individual letters the window must contain
+        // eg if p has 3 As, count will decrease when the window contains 3 As
         int count = letters.size();
         while (end < s.length()) {
-            char chr = s.charAt(end);
-            letters.put(chr, letters.get(chr) - 1);
-            if (letters.get(chr) == 0) {
-                count--;
+            char endchr = s.charAt(end);
+            if (letters.containsKey(endchr)) {
+                letters.put(endchr, letters.get(endchr) - 1);
+                if (letters.get(endchr) == 0) {
+                    count--;
+                } // if
             } // if
+            end++;
 
-
-            if (count == 0) {
-                res.add(bgn);
-                letters.put(chr, letters.get(chr) + 1);
-                if (letters.get(chr) == 1) {
-                    count++;
+            while (count == 0) {
+                if (end - bgn == p.length()) {
+                    res.add(bgn);
+                } // if
+                char bgnchr = s.charAt(bgn);
+                if (letters.containsKey(bgnchr)) {
+                    letters.put(bgnchr, letters.get(bgnchr) + 1);
+                    if (letters.get(bgnchr) == 1) {
+                        count++;
+                    } // if
                 } // if
                 bgn++;
             } // while
