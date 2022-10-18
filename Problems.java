@@ -422,6 +422,38 @@ class Problems {
         } // for
         return s;
     } // missingNumber()
+    // 299. Bulls and Cows
+    // bad but on the right track
+    public String getHint(String secret, String guess) {
+        int bulls = 0;
+        for (int i = 0; i < secret.length(); i++) {
+            if (secret.charAt(i) == guess.charAt(i)) {
+                bulls++;
+            } // if
+        } // for i
+        int[] numCounts = new int[10];
+        boolean[] presentSecret = new boolean[10];
+        boolean[] presentGuess = new boolean[10];
+        int cows = 0;
+        for (int i = 0; i < secret.length(); i++) {
+            if (secret.charAt(i) != guess.charAt(i)) {
+                presentSecret[secret.charAt(i) - '0'] = true;
+                presentGuess[guess.charAt(i) - '0'] = true;
+                cows++;
+                numCounts[secret.charAt(i) - '0']++;
+                numCounts[guess.charAt(i) - '0']--;
+            } // if
+        } // for i
+        for (int i = 0; i < present.length; i++) {
+            if (presentSecret[i]) {
+                cows -= numCounts[i];
+            } // if
+            if (presentGuess[i] && !presentSecret[i]) {
+                cows += numCounts[i];
+            } // if
+        } // for i
+        return bulls + "A" + cows + "B";
+    } // getHint()
 
     // 332. Coin Change
     // TODO
