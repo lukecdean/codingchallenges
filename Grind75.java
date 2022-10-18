@@ -2407,6 +2407,7 @@ public class Grind75 {
 
     // 310. Minimum Height Trees
     //
+    // scratch this approach
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
         Map<Integer, List<Integer>> tree = new HashMap<>();
         // build the tree
