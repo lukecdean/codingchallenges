@@ -2407,6 +2407,58 @@ public class Grind75 {
 
     // 310. Minimum Height Trees
     //
+    public List<Integer> findMinHeightTrees(int n, int[][] edges) {
+        // observe that there may only be 1 or 2 nodes which are
+        // the minimum distance form the ends. ie the centroids
+        // edge case: if n <= 2
+        if (n <= 2) {
+            List<Integer> res = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                res.add(i);
+            } // for i
+            return res;
+        } // if
+        // buid the graph from the edges array
+        List<Set<Integer>> neighbors = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            neighbors.add(new HashSet<Integer>());
+        } // for i
+        for (int[] e : edges) {
+            neighbors.get(e[0]).add(e[1]);
+            neighbors.get(e[1]).add(e[0]);
+        } // for e
+        // remove leaf nodes (have only 1 neighbor) one by one until 1 or 2 nodes remain
+        // first add each leaf to a queue
+        Queue<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (neighbors.get(i).size() == 1) {
+                queue.offer(n);
+            } // if
+        } // for i
+        int count = n;
+        // remove the leaves in rounds until 1 or 2 remain
+        while (count > 2) {
+            int leaves = queue.size();
+            count -= leaves;
+            // to remove a leaf, remove it from its neighbor and remove its neighbor
+            while (leaves > 0) {
+                int leaf = queue.poll();
+                int neighbor = neighbors.get(leaf).iterator().next();
+                neighbors.get(neighbor).remove(leaf); // remove leaf's neighbor's connection to leaf
+                if (neighbors.get(neighbor).size() == 1) { // if the neighbor becomes a leaf, offer it
+                    queue.offer(neighbor);
+                } // if
+                leaves--;
+            } // while
+        } // while
+        // add the remaining nodes to the res
+        List<Integer> res = new ArrayList<>();
+        // they should be sitting in the queue
+        while (!queue.isEmpty()) {
+            res.add(queue.poll());
+        } // while
+        return res;
+    } // findMinHeightTrees()
     // scratch this approach
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
         Map<Integer, List<Integer>> tree = new HashMap<>();

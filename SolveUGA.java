@@ -309,6 +309,43 @@ class SolveUGA {
     // no meeting
     // 10-14-2022
     // no meeting
+    // 10-19-2022
+    public boolean checkIfPangram(String sentence) {
+        int letters = 0;
+        for (int i = 0; i < sentence.length(); i++) {
+            letters = letters | (1 << sentence.charAt(i) - 'a');
+            if (letters == 67108863) {
+                return true;
+            } // if
+        } // for i
+        return false;
+    } // checkIfPangram()
+    public boolean checkIfPangram(String sentence) {
+        int letters = 0;
+        for (int i = 0; i < sentence.length(); i++) {
+            letters = letters | (1 << sentence.charAt(i) - 'a');
+        } // for i
+        return letters == 67108863;
+    } // checkIfPangram()
+    // 1832. Check if the Sentence Is Pangram
+    public boolean checkIfPangram(String sentence) {
+        int letters = 0;
+        // mark all found letters
+        for (int i = 0; i < sentence.length(); i++) {
+            int intVal = sentence.charAt(i) - 'a';
+            letters = letters | (1 << intVal);
+        } // for i
+        for (int i = 0; i < 26; i++) {
+            if (((letters >> i) & 1) != 1) {
+                return false;
+            } // if
+        } // for i
+        return true;
+    } // checkIfPangram()
+
+    // 692. Top K Frequent Words
+    public List<String> topKFrequent(String[] words, int k) {
+    } // topKFrequent()
 
 } // class
 
