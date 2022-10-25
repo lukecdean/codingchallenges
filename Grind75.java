@@ -3034,19 +3034,63 @@ public class Grind75 {
     // 981. Time Based Key-Value Store
     // TODO
     class TimeMap {
+        class Data {
+            String value;
+            int timestamp;
+
+            public Data(String value, int timestamp) {
+                this.value = value;
+                this.timestamp = timestamp;
+            } // Data()
+        } // class Data
+
+        Map<String, List<Data>> map;
 
         public TimeMap() {
-
+            map = new HashMap<>();
         } // TimeMap()
 
         public void set(String key, String value, int timestamp) {
-
+            if (!map.containsKey(key)) {
+                map.put(key, new ArrayList<Data>());
+            } // if
+            map.get(key).add(new Data(value, timestamp));
         } // set(k,v,t)
 
         public String get(String key, int timestamp) {
-
+            if (!containsKey(key)) {
+                return "";
+            } else { // binary search for the value
+                return binarySearch(map.get(key), int timestamp);
+            } // if
         } // get(k,t) 
+
+        private binarySearch(List<Data> list, int timestamp) {
+            int lo = 0;
+            int hi = list.size();
+            int mid;
+            while (lo < hi) {
+                mid = lo + hi >> 2;
+                if (list.get(mid).timestamp == timestamp) {
+                    return list.get(mid).value;
+                } else if (list.get(mid).timestamp < timestamp) { // value is leftward
+                    if (list.get(mid + 1).timestamp > timestamp) {
+                        return list.get(mid + 1).value;
+                    } // if
+                    hi = mid - 1;
+                } else { // value is rightward
+                    lo = mid + 1;
+                } // if
+            } // while
+
+            if (list.get(0).timestamp > timestamp) {
+                return "";
+            } else {
+                return list.get(mid).value;
+            } // if
+        } // binarySearch
     } // TimeMap()
+
     // 994. Rotting Oranges
     // approach is like BFS
     // O(n)/O(n)
