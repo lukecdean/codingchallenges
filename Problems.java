@@ -700,5 +700,31 @@ class Problems {
             deleteIsland(grid, ix, iy + 1, m, n);
         return size;
     } // deleteIsland()
+    // 1662. Check If Two String Arrays are Equivalent
+    // 96/99 @ 1ms
+    public boolean arrayStringsAreEqual(String[] word1, String[] word2) {
+        int ip1 = 0;
+        int ip2 = 0;
+        int cp1 = 0;
+        int cp2 = 0;
+        while (ip1 < word1.length && ip2 < word2.length) {
+            //System.out.printf("ip1: %d, cp1: %d, ip2: %d, cp2: %d\n", ip1, cp1, ip2, cp2);
+            if (word1[ip1].charAt(cp1) != word2[ip2].charAt(cp2)) {
+                return false;
+            } // if
+            cp1++;
+            if (cp1 == word1[ip1].length()) {
+                ip1 += 1;
+                cp1 = 0;
+            } // if
+            cp2++;
+            if (cp2 == word2[ip2].length()) {
+                ip2 += 1;
+                cp2 = 0;
+            } // if
+        } // while
+        return ((ip1 == word1.length) && (ip2 == word2.length));
+    } // arrayStringsAreEqual()
+
 
 } // Problems

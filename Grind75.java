@@ -2136,6 +2136,102 @@ public class Grind75 {
         return root;
     } // invertTree()
 
+    // 230. Kth Smallest Element in a BST
+    // 100/ @ 0ms
+    public int kthSmallest(TreeNode root, int k) {
+        return -1 * dfs(root, k);
+    } // kthSmallest()
+    public int dfs(TreeNode root, int k) {
+        if (root == null) return k;
+        k = dfs(root.left, k);
+        if (k <= 0) return k;
+        if (k == 1) return root.val * -1;
+        return dfs(root.right, k - 1);
+    } // kthSmallest()
+
+    // 82/73 @ 1ms
+    public int kthSmallest(TreeNode root, int k) {
+        return -1 * dfs(root, k);
+    } // kthSmallest()
+    // if return is > 0, it is the new k
+    // else if <= 0, it is the kth smallest element
+    public int dfs(TreeNode root, int k) {
+        if (root == null) {
+            return k;
+        } // if
+        k = dfs(root.left, k);
+        if (k <= 0) {
+            return k;
+        } // if
+        if (k == 1) {
+            return root.val * -1;
+        } else {
+            k--;
+            return dfs(root.right, k);
+        } // if
+    } // kthSmallest()
+
+    public int dfs(TreeNode root, int k) {
+        if (root == null) return k;
+        k = dfs(root.left, k);
+        if (k <= 0) return k;
+        if (k == 1) return root.val * -1;
+        return dfs(root.right, k - 1);
+    } // kthSmallest()
+
+
+    public int kthSmallest(TreeNode root, int k) {
+        if (root == null) {
+            return 0;
+        } // if
+        int lres = kthSmallest(root.left, k);
+        if (lres < 0) {
+            k -= lres;
+        } // if
+        if (k == 
+        int rres = kthSmallest(root.right, k);
+    } //kthSmallest()
+    class Result {
+        int returns;
+        TreeNode node;
+
+        Result() {
+            returns = 0;
+        } // Result()
+        Result(int returns, TreeNode node) {
+            this.returns = returns;
+            this.node = node;
+        } // Result()
+    } // class Result
+    public int kthSmallest(TreeNode root, int k) {
+        //Result res = new Result();
+        int res = kthSmallest(root.left, k);
+        if (res != -1) {
+            return res;
+        } // if
+        k--;
+        if (k == 0) {
+            return root.val;
+        } // if
+        res = kthSmallest(root.right, k);
+        if (res != -1) {
+            return res;
+        } // if
+        k--;
+        if (k == 0) {
+            return root.val;
+        } // if
+
+        
+    } // kthSmallest()
+    private Result dfs(TreeNode root, Result res) {
+        if (root == null) {
+            return;
+        } // if
+        dfs(root.left);
+        dfs(root.right);
+    } // dfs()
+    
     // 232. Implement Queue Using Stack
     // 71/81 @ 1ms; 
     private Stack<Integer> s1;
@@ -3058,36 +3154,31 @@ public class Grind75 {
         } // set(k,v,t)
 
         public String get(String key, int timestamp) {
-            if (!containsKey(key)) {
+            if (!map.containsKey(key)) {
                 return "";
             } else { // binary search for the value
-                return binarySearch(map.get(key), int timestamp);
+                return binarySearch(map.get(key), timestamp);
             } // if
         } // get(k,t) 
 
-        private binarySearch(List<Data> list, int timestamp) {
+        private String binarySearch(List<Data> list, int timestamp) {
             int lo = 0;
-            int hi = list.size();
+            int hi = list.size() - 1;
             int mid;
             while (lo < hi) {
                 mid = lo + hi >> 2;
-                if (list.get(mid).timestamp == timestamp) {
+                if (list.get(mid).timestamp == timestamp) {       // found
                     return list.get(mid).value;
-                } else if (list.get(mid).timestamp < timestamp) { // value is leftward
+                } else if (list.get(mid).timestamp < timestamp) { // rightward
                     if (list.get(mid + 1).timestamp > timestamp) {
-                        return list.get(mid + 1).value;
+                        return list.get(mid).value;
                     } // if
-                    hi = mid - 1;
-                } else { // value is rightward
                     lo = mid + 1;
+                } else {                                          // leftward
+                    hi = mid - 1;
                 } // if
             } // while
-
-            if (list.get(0).timestamp > timestamp) {
-                return "";
-            } else {
-                return list.get(mid).value;
-            } // if
+            return list.get(lo).timestamp <= timestamp ? list.get(lo).value : "";
         } // binarySearch
     } // TimeMap()
 
