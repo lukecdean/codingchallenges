@@ -103,7 +103,6 @@ class Problems {
         } // for
         return stack.size() == 0;
     } // isValid
-
     // 53. Maximum Subarray
     //
     public int maxSubArray(int[] nums) {
@@ -138,7 +137,6 @@ class Problems {
         } // while
         return max;
     } // maxSubArray()
-
     // 61. Rotate List
     // 80/60
     public ListNode rotateRight(ListNode head, int k) {
@@ -201,7 +199,6 @@ class Problems {
         head.next = null; // cut the end of the rotated list
         return n;
     } // rotateList
-
     // 62. Unique Paths
     // 100/60
     public int uniquePaths(int m, int n) {
@@ -252,7 +249,6 @@ class Problems {
         } // if
         return paths[m][n];
     } // up()
-
     // 70. Climbing Stairs
     // 11/41
     HashMap<Integer, Integer> map = new HashMap<>();
@@ -267,7 +263,6 @@ class Problems {
         
         return map.get(n);
     } // climbStairs()
-
     // 100. Same Tree
     public boolean isSameTree(TreeNode p, TreeNode q) {
         if (p == null || q == null) {
@@ -283,6 +278,26 @@ class Problems {
             return false;
         } // if
     } // isSameTree
+    // 167. Two Sum II
+    //
+    public int[] twoSum(int[] numbers, int target) {
+        int b = 0;
+        int e = numbers.length - 1;
+        int sum;
+        int[] res = new int[]{-1, -1};
+        while (b < e) {
+            sum = numbers[b] + numbers[e];
+            if (sum == target) {
+                res = int[]{b, e};
+                break;
+            } else if (sum < target) {
+                b++;
+            } else { // sum > target
+                e--;
+            } // if
+        } // while
+        return res;
+    } // twoSum()
 
     // 190. Reverse Bits
     // 
@@ -310,13 +325,11 @@ class Problems {
         } // if
         return res;
     } // reverseBits
-    
     // 198. House Robber
     //
     public int rob(int[] nums) {
         return 0;
     } // rob()
-
     // 200. Number of Islands
     // 77/32, 98/1
     public int numIslands(char[][] grid) {
@@ -347,7 +360,6 @@ class Problems {
         deleteIsland(grid, ix, iy - 1, m, n);
         deleteIsland(grid, ix, iy + 1, m, n);
     } // deleteIsland()
-
     // 206. Reverse Linked List
     // 100/65-90
     public ListNode reverseList(ListNode head) {
@@ -359,7 +371,6 @@ class Problems {
         head.next = null;
         return n; 
     } // reverseList()
-
     // 226. Invert Binary Tree
     // 100/74
     public TreeNode invertTree(TreeNode root) {
@@ -373,7 +384,6 @@ class Problems {
         } // if
         return root;
     } // invertTree()
-
     // 238. Product of Array Except Self
     // 52/80 @ 3 ms; 88/90 @ 2 ms; 
     // make 2 arrs which hold the prefix and suffix at each point
@@ -396,7 +406,6 @@ class Problems {
         } // for i
         return nums;
     } // productExceptSelf()
-
     // 286. Missing Number
     // 73/59 @ 1 ms; 100/54 @ 0 ms
     public int missingNumber(int[] nums) {
@@ -501,7 +510,6 @@ class Problems {
         } // for
         return -1;
     } // coinChange()
-
     // 338. Counting Bits
     // 99/86
     public int[] countBits(int n) {
@@ -517,7 +525,6 @@ class Problems {
         } // for
         return res;
     } // countBits()
-
     // 371. Sum of Two Integers
     // 100/74
     public int getSum(int a, int b) {
@@ -654,21 +661,68 @@ class Problems {
         } // while
     } // findPredecessor()
 
-    // 572. Subtree of Another Tree
-    public boolean isSubtree(TreeNode root, TreeNode subRoot) {
-        if (root == null || subRoot == null) {
-            if (root == subRoot) {
+    // 523. Continuous Subarray Sum
+    //
+    public boolean checkSubarraySum(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
+        int sum = 0;
+        int rem;
+        for (int i = 0; i < nums.length; i++) {
+            sum += nums[i];
+            rem = sum % k;
+            if (!map.containsKey(rem)) {
+                map.put(rem, i);
+            } // if
+            // if another sum with the same remainder exists at least 2 indeces before i
+            if (i - 1 > map.get(rem)) {
                 return true;
             } // if
-            return false;
-        } // if
-        if (isSameTree(root, subRoot)) {
-            return true;
-        } // if
-        return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
-        // isSubtree(root, subRoot, false);
-    } // isSubtree
+        } // for i
+        return false;
+    } // checkSubArraySum()
 
+    // Time Limit Exceded
+    public boolean checkSubarraySum(int[] nums, int k) {
+        int[] subArraySum = new int[nums.length];
+        subArraySum[0] = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            subArraySum[i] = subArraySum[i - 1] + nums[i];
+        } // for i
+        int sum; // temp var
+        for (int i = 1; i < subArraySum.length; i++) {
+            // check if the subArraySum is a multiple
+            if (isMultiple(subArraySum[i], k)) {
+                return true;
+            } // if
+            // else check if any subArraySum - subArraySum is a multiple
+            for (int j = 0; j < i - 1; j++) {
+                sum = subArraySum[i] - subArraySum[j];
+                if (isMultiple(sum, k)) {
+                    return true;
+                } // if
+            } // for j
+        } // for i
+        return false; // if no multiples were found 
+    } // checkSubarraySum()
+    // true if n is a multiple of k
+    private boolean isMultiple(int n, int k) {
+        return ((n == 0) || (n % k == 0));
+    } // isMultiple()
+
+            // 572. Subtree of Another Tree
+            public boolean isSubtree(TreeNode root, TreeNode subRoot) {
+                if (root == null || subRoot == null) {
+                    if (root == subRoot) {
+                        return true;
+                    } // if
+                    return false;
+                } // if
+                if (isSameTree(root, subRoot)) {
+                    return true;
+                } // if
+                return isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+                // isSubtree(root, subRoot, false);
+            } // isSubtree
     // 695. Max Area of Island
     // 100/93
     public int maxAreaOfIsland(int[][] grid) {
@@ -700,6 +754,23 @@ class Problems {
             deleteIsland(grid, ix, iy + 1, m, n);
         return size;
     } // deleteIsland()
+    // 1544. Make The String Great
+    //
+    public String makeGood(String s) {
+        char a;
+        char b;
+        String res;
+        for (int i = 0; i < s.length() - 1; i++) {
+            a = s.charAt(i);
+            b = s.charAt(i + 1);
+            if (a - b == 'a' - 'A' || b - a == 'a' - 'A') {
+                res.append(a);
+            } else {
+                i += 2;
+            } // if
+        } // for
+    } // makeGood()
+
     // 1662. Check If Two String Arrays are Equivalent
     // 96/99 @ 1ms
     public boolean arrayStringsAreEqual(String[] word1, String[] word2) {

@@ -1,4 +1,5 @@
 class SolveUGA {
+    // First meeting
     public boolean validMountainArray(int[] arr) {
         int i = 1;
         while (i < arr.length) {
@@ -344,8 +345,46 @@ class SolveUGA {
     } // checkIfPangram()
 
     // 692. Top K Frequent Words
-    public List<String> topKFrequent(String[] words, int k) {
-    } // topKFrequent()
+    // 10-26-2022
+    // 99/98 @ 18ms
+    public boolean checkSubarraySum(int[] nums, int k) {
+        // the trick: if a sum has remainder r another sum with remainder r can be subtracted
+        // from it, the resulting sums remainder will be 0 i.e. a multiple
+        Set<Integer> set = new HashSet<>();
+        int prevRem = 0; // the remainder before last. start with 0
+        int currRem;
+        for (int i = 0; i < nums.length; i++) {
+            // calculate currRem and check if it already exists
+            currRem = (prevRem + nums[i]) % k;
+            if (set.contains(currRem)) {
+                return true;
+            } // if
+            // now the rem before last may be added to the set
+            // this is bc the sub array must be at least two
+            // could use a queue to generalize to at least n sized subarray
+            set.add(prevRem);
+            prevRem = currRem;
+        } // for i
+        return false; // if no matching remainders were found
+    } // checkSubarraySum()
+
+    public boolean checkSubarraySum(int[] nums, int k) {
+        int[] prefixRems = new int[nums.length + 1];
+        int sum = 0;
+        prefixRems[0] = 0;
+        for (int i = 1; i < prefixRems.length; i++) {
+            sum += nums[i - 1];
+            sum %= k;
+            prefixRems[i] = sum;
+        } // for i
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < prefixRems.length; i++) {
+            if (!map.containsKey(prefixRems[i])) {
+                map.put(prefixRems[i], i - 1);
+            } else if (map.get(prefixRems[i]) < i - 1) {
+            } // if
+        } // for i
+
+    } // checkSubarraySum()
 
 } // class
-

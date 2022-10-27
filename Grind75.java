@@ -1,5 +1,4 @@
 public class Grind75 {
-
     // 1. Two Sum
     // 92/31
     public int[] twoSum(int[] nums, int target) {
@@ -2735,8 +2734,6 @@ public class Grind75 {
         return false;
     } // backtrack()
 
-
-
     // 438. Find All Anagrams in a String
     // O(n)/O(m)
     // 48/35 @ 35ms
@@ -2804,7 +2801,6 @@ public class Grind75 {
                 } // if
             } // if
         } // for i
-    } // findAnagrams()
     } // findAnagrams()
     private boolean isAnagram(String s, String p, int i, Map<Character, Integer> letters) {
     } // isAnagram()
@@ -2887,7 +2883,57 @@ public class Grind75 {
     } // search()
 
     // 721. Accounts Merge
-    // TODO
+    // 
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        Map<String, String> uf = new HashMap<>();
+        for (List<String> list : accounts) {
+            // make the first email in the account the representative
+            if (!uf.containsKey(list.get(1))) { // first email does not exist in uf
+                uf.put(list.get(1), list.get(1));
+            } // if
+            String rep = getRep(uf, list.get(1));
+            for (int i = 2; i < list.size(); i++) {
+                if (uf.containsKey(list.get(i)) { // if an email is already in the uf
+                    // point one rep to the other
+                    String rep1 = getRep(uf, uf.get(list.get(i)));
+                    uf.put(rep1, rep);
+                } else { // the email does not exist in the uf
+                    uf.put(list.get(i), rep);
+                } // if
+            } // for i
+        } // for list
+        collapse(uf); // now collapse the uf
+        return merge(accouts, uf);
+    } // accountsMerge()
+    private List<List<String>> merge(List<List<String>> accounts, Map<String, String> uf) {
+        for (List<String> list : accounts) {
+            if (uf.get(list.get(1)) != null) {
+            } // if
+        } // for list
+    } // merge()
+    private String getRep(Map<String, String> uf, String s) {
+        String parent = uf.get(s);
+        while (!s.equals(parent)) {
+            s = parent;
+            parent = uf.get(s);
+        } // while
+        return parent;
+    } // getRep()
+    private void collapse(Map<String, String> uf) {
+        for (String s : uf.keySet()) {
+            collapsePath(uf, s);
+        } // for s
+    } // collapse()
+    // Recursively travels to the rep then points each element directly to the rep on returns
+    private String collapsePath(Map<String, String> uf, String s) {
+        if (s.equals(uf.get(s)) { // rep found
+            return s;
+        } // if
+        String rep = collapsePath(uf, uf.get(s));
+        uf.put(s, rep);
+        return rep;
+    } // collapsePath()
+
     public List<List<String>> accountsMerge(List<List<String>> accounts) {
         // associate each email in the accounts with an account
         Map<String, Integer> map = new HashMap<>();
@@ -3128,7 +3174,7 @@ public class Grind75 {
     } // eD
 
     // 981. Time Based Key-Value Store
-    // TODO
+    // 96/98 @ 160ms; 29/74 @s 424ms
     class TimeMap {
         class Data {
             String value;
@@ -3166,7 +3212,7 @@ public class Grind75 {
             int hi = list.size() - 1;
             int mid;
             while (lo < hi) {
-                mid = lo + hi >> 2;
+                mid = lo + hi >> 1;
                 if (list.get(mid).timestamp == timestamp) {       // found
                     return list.get(mid).value;
                 } else if (list.get(mid).timestamp < timestamp) { // rightward
@@ -3232,6 +3278,5 @@ public class Grind75 {
             q.offer(neighbor);
         } // for
     } // rotNeighbors()
-
 
 } // class
