@@ -768,7 +768,6 @@ class Problems {
             } else {
                 i += 2;
             } // if
-
         } // for
     } // makeGood()
 
