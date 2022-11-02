@@ -2861,6 +2861,20 @@ public class Grind75 {
         return mat;
     } // updateMatrix()
         
+    // 621. Task Scheduler
+    //
+    public int leastInterval(char[] tasks, int n) {
+        // count the number of each task
+        int[] cts = new int[26];
+        for (char c : tasks) {
+            cts[c - 'A'] += 1;
+        } // for c
+        Queue<Charater> q = new LinkedList<>();
+        while (n > 0) {
+            q.offer(' ');
+        } // while
+    } // leastInterval()
+
     // 704. Binary Search
     // 100/73 O(log(n))
     public int search(int[] nums, int target) {
