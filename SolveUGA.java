@@ -387,4 +387,67 @@ class SolveUGA {
 
     } // checkSubarraySum()
 
+    // 11-2-2022
+    // 1706 Where will the ball fall
+    public int[] findBall(int[][] grid) {
+        int lyrs = grid.length;
+        int cols = grid[0].length;
+        int[] res = new int[cols];
+        for (int i = 0; i < cols; i++) {
+            int lyr = 0; // layer the ball is on
+            int col = i; // column the ball is in
+            //System.out.printf("lyr: %d, col: %d\n", lyr, col);
+            while (lyr < lyrs) {
+                if (grid[lyr][col] == 1) {
+                    col += 1;
+                    if (col >= cols || grid[lyr][col] == -1) {
+                        res[i] = -1;
+                        break;
+                    } else {
+                        lyr++;
+                    } // if
+                } else { // == -1
+                    col -= 1;
+                    if (col < 0 || grid[lyr][col] == 1) {
+                        res[i] = -1;
+                        break;
+                    } else {
+                        lyr++;
+                    } // if
+                } // if
+            } // while lyr
+            if (lyr == lyrs) {
+                res[i] = col;
+            } // if
+        } // for i
+        return res;
+    } // findBall()
+    // part II
+    // 74/ @ 2ms
+    public int[] findBall(int[][] grid) {
+        int rows = grid.length;
+        int cols = grid[0].length;
+        int[] res = new int[cols];
+        for (int i = 0; i < cols; i++) {
+            int row = 0; // row the ball is on
+            int col = i; // col the ball is in
+            //System.out.printf("lyr: %d, col: %d\n", lyr, col);
+            while (row < rows) {
+                int val = grid[row][col];
+                col += val;
+                if (col < 0 || col >= cols || grid[row][col] != val) {
+                    res[i] = -1;
+                    break;
+                } else {
+                    row++;
+                } // if
+            } // while row
+            if (row == rows) {
+                res[i] = col;
+            } // if
+        } // while row
+        return res;
+    } // findBall()
+
+
 } // class
