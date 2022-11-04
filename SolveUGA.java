@@ -449,5 +449,39 @@ class SolveUGA {
         return res;
     } // findBall()
 
+    // 11-4-2022
+    // 2131. Longest Palindrome by Concatenating Two Letter Words
+    // 86/70 @ 23ms
+    public int longestPalindrome(String[] words) {
+        int res = 0;
+        int[] doubleLetters = new int[26];
+        int[][] wordsMap = new int[26][26];
+        for (String word : words) {
+            if (word.charAt(0) == word.charAt(1)) {
+                doubleLetters[word.charAt(0) - 'a']++;
+            } else {
+                // if its reverse has been found before and is unmatched
+                if (wordsMap[word.charAt(1) - 'a'][word.charAt(0) - 'a'] > 0) {
+                    res += 4;
+                    wordsMap[word.charAt(1) - 'a'][word.charAt(0) - 'a']--;
+                } else {
+                    wordsMap[word.charAt(0) - 'a'][word.charAt(1) - 'a']++;
+                } // if
+            } // if
+        } // for word
+        boolean oddDoubleLetter = false;
+        for (int count : doubleLetters) {
+            if ((count & 1) == 1) { // odd number of doubleLetter words
+                if (!oddDoubleLetter) {
+                    res += 2;
+                    oddDoubleLetter = true;
+                } // if
+                count--;
+            } // if
+            res += 2 * count;
+        } // for count
+        return res;
+    } // longestPalindrome()
+
 
 } // class
