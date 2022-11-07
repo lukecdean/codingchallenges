@@ -2862,18 +2862,134 @@ public class Grind75 {
     } // updateMatrix()
         
     // 621. Task Scheduler
-    //
+    // O(nlogn)/O(n)
+    // 12/6 @ 106ms
     public int leastInterval(char[] tasks, int n) {
-        // count the number of each task
-        int[] cts = new int[26];
-        for (char c : tasks) {
-            cts[c - 'A'] += 1;
-        } // for c
-        Queue<Charater> q = new LinkedList<>();
-        while (n > 0) {
-            q.offer(' ');
+        // count how many of each task
+        int[] counts = new int[26];
+        for (char task : tasks) {
+            counts[task - 'A']++;
+        } // for task
+        PriorityQueue<Integer> pq = new PriorityQueue<>((Integer x, Integer y) -> y - x);
+        int tasksLeft = 0;
+        for (int ch = 0; ch < 26; ch++) {
+            if (counts[ch] > 0) {
+                pq.offer(counts[ch]);
+                tasksLeft++;
+            } // if
+        } // for ch
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            q.offer(-1);
+        } // for i
+        int clock = 0;
+        while (tasksLeft > 0) {
+            if (!pq.isEmpty()) { // i.e. a task is ready to run
+                int task = pq.poll();
+                task--; // run task
+                if (task == 0) { // the task has been run enough times
+                    tasksLeft--;
+                    q.offer(-1);
+                } else { // the task must run more and must cool down
+                    q.offer(task);
+                } // if
+            } else { // if no tasks are ready, idle
+                q.offer(-1);
+            } // if
+            int task = q.poll();
+            if (task != -1) { // if a task has cooled down
+                pq.offer(task);
+            } // if
+            clock++;
         } // while
+        return clock;
     } // leastInterval()
+    public int leastInterval(char[] tasks, int n) {
+        // count how many of each task
+        int[] counts = new int[26];
+        for (char task : tasks) {
+            counts[task - 'A']++;
+        } // for task
+        // create Tasks and add to PriorityQueue
+        PriorityQueue<Task> pq = new PriorityQueue<>();
+        int differentTasksLeft = 0;
+        for (int ch = 0; ch < counts.length; ch++) {
+            if (counts[ch] == 0) {
+                continue;
+            } // if
+            Task t = new Task((char) (ch + 'A'), counts[ch]);
+            pq.offer(t);
+            differentTasksLeft++;
+        } // for ch
+        // now create a queue for cooldowns. q.length() == n.
+        Queue<Task> q = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            q.offer(new Task());
+        } // for i
+        // now start running tasks
+        int clock = 0;
+        while (differentTasksLeft > 0) {
+            // if there are tasks ready to run
+            if (pq.size() > 0) {
+                Task t = pq.poll();
+                t.removeTask();
+                // is the last time this task must be run?
+                if (t.isFinished()) {
+                    differentTasksLeft--;
+                    q.offer(new Task());
+                } else {
+                    q.offer(t);
+                } // if
+            } else { // else idle
+                q.offer(new Task());
+            } // if
+            clock++;
+            // if a task cooled down, return it to the pq
+            Task cooledTask = q.poll();
+            if (cooledTask != null && !cooledTask.isIdleTask()) {
+                pq.offer(cooledTask);
+            } // if
+        } // while
+        return clock;
+    } // leastInterval()
+    class Task implements Comparable<Task> {
+        char taskLabel;
+        int tasksLeft;
+        boolean idleTask;
+
+        // Default contstructor makes an idle task.
+        public Task() {
+            idleTask = true;
+        } // Task()
+
+        public Task(char taskLabel, int tasksLeft) {
+            this.taskLabel = taskLabel;
+            tasksLeft = 0;
+            idleTask = false;
+        } // Task()
+
+        public void addTask() {
+            tasksLeft++;
+        } // addTask()
+
+        public void removeTask() {
+            tasksLeft--;
+        } // removeTask()
+
+        public boolean isFinished() {
+            return tasksLeft == 0;
+        } // isFinished()
+
+        public boolean isIdleTask() {
+            return idleTask;
+        } // isCoolDownTask()
+
+        // Task with most remaining to be first.
+        public int compareTo(Task t) {
+            return t.tasksLeft - this.tasksLeft;
+            // return this.tasksLeft - t.tasksLeft;
+        } // compareTo()
+    } // class Task
 
     // 704. Binary Search
     // 100/73 O(log(n))
