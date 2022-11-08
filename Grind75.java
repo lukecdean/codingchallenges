@@ -3182,6 +3182,35 @@ public class Grind75 {
         floodFill(image, sr, sc - 1, colorToReplace, color);
     } // floodFill()
 
+    // 739. Daily Temperatures
+    // O(nlogn)/O(n)
+    // 75/84 @ 88ms
+    public int[] dailyTemperatures(int[] temperatures) {
+        int[] res = new int[temperatures.length];
+        PriorityQueue<Day> pq = new PriorityQueue<>();
+        for (int day = 0; day < temperatures.length; day++) {
+            while (!pq.isEmpty() && pq.peek().temp < temperatures[day]) {
+                Day d = pq.poll();
+                res[d.day] = day - d.day;
+            } // while
+            pq.offer(new Day(day, temperatures[day]));
+        } // for day
+        return res;
+    } // dailyTemperatures()
+    class Day implements Comparable {
+        int day;
+        int temp;
+
+        public Day(int day, int temp) {
+            this.day = day;
+            this.temp = temp;
+        } // Day()
+
+        public int compareTo(Day d) {
+            return this.temp - d.temp;
+        } // compare()
+    } // class Day
+
     // 844. Backspace String Compare
     // 95/73 @ 1ms;
     public boolean backspaceCompare(String s, String t) {
