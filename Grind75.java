@@ -1477,6 +1477,66 @@ public class Grind75 {
         return clone;
     } // cloneGraphR()
 
+    // Gas Station
+    //
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int stations = gas.length;
+        int[] dif = new int[stations];
+        for (int i = 0; i < stations; i++) {
+            dif[i] = gas[i] - cost[i];
+        } // for i
+        // find the starting gas station which gives the greatest amount of gas
+        // it will be impossible to have more gas than this so if a station works, its this one
+        int b = 0;
+        int e = 1;
+        int maxGas = dif[0];
+        int maxGasStartingStation = 0;
+        int curTank = dif[0];
+        while (b < stations && e < stations) {
+            if (e == stations - 1) {
+                curTank -= dif[b];
+                b++;
+            } else if (b == e || curTank >= 0) {
+                e++;
+                curTank += dif[e];
+            } else { // curTank < 0
+                curTank -= dif[b];
+                b++;
+            } // if
+            if (curTank > maxGas) {
+                maxGas = curTank;
+                maxGasStartingStation = b;
+            } // if
+        } // while
+        // now see if starting at this station works
+        int tank = 0;
+        for (int station = maxGasStartingStation; station < stations + maxGasStartingStation; station++) {
+            tank += dif[station % stations];
+            if (tank < 0) {
+                return -1;
+            } // if
+        } // for station
+        return maxGasStartingStation;
+    } // canCompleteCircuit()
+    // O(n^2) brute force approach
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int stations = gas.length;
+        for (int i = 0; i < stations; i++) {
+            int tank = 0;
+            for (int j = i; j < stations + i; j++) {
+                tank += gas[j % stations];
+                tank -= cost[j % stations];
+                if (tank < 0) {
+                    break;
+                } // if
+            } // for j
+            if (tank >= 0) {
+                return i;
+            } // if
+        } // for i
+        return -1;
+    } // cCC()
+
     // 139. Word Break
     // O(n^2)/O(n)
     // 84/98 @ 5ms
@@ -1815,6 +1875,63 @@ public class Grind75 {
         } // for
         return maj;
     } // majortyElement()
+
+    // 198. House Robber
+    // 100/ @ 0ms
+    // iteravely
+    public int rob(int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        } // if
+        int ppHouse = nums[0];
+        int pHouse = Math.max(nums[0], nums[1]);
+        int house = pHouse;
+        for (int i = 2; i < nums.length; i++) {
+            house = Math.max(pHouse, ppHouse + nums[i]);
+            ppHouse = pHouse;
+            pHouse = Math.max(ppHouse, house);
+        } // for i
+        return house;
+    } // rob()
+    public int rob(int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        } else if (nums.length == 2) {
+            return Math.max(nums[0], nums[1]);
+        } // if
+        int prevHouse = nums[0];
+        int prevPrevHouse = nums[1];
+        int house = 0;
+        for (int i = 2; i < nums.length; i++) {
+            house = Math.max(prevHouse, prevPrevHouse + nums[i]);
+            prevPrevHouse = prevHouse;
+            prevHouse = house;
+        } // for i
+        return house;
+    } // rob
+    // recursively
+    public int rob(int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        } else if (nums.length == 2) {
+            return Math.max(nums[0], nums[1]);
+        } // if
+        int[] value = new int[nums.length];
+        Arrays.fill(value, -1);
+        int[0] = nums[0];
+        int[1] = nums[1];
+        return rob(nums, dp, nums.length - 1);
+    } // rob()
+    private int rob(int[] nums, int[] dp, int house) {
+        if (dp[house] == -1) {
+            // rob this house (can't rob previous)
+            int rob = nums[house] + rob(nums, dp, house - 2);
+            // or don't rob this house (can rob previous)
+            int dontRob = rob(nums, dp, house - 1);
+            dp[house] = Math.max(rob, dontRob);
+        } // if
+        return dp[house];
+    } // rob()
 
     // 199. Binary Tree Right Side View
     // O(n)/O(n)
