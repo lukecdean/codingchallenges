@@ -1477,8 +1477,106 @@ public class Grind75 {
         return clone;
     } // cloneGraphR()
 
-    // Gas Station
-    //
+    // 134. Gas Station
+    // O(n)/O(1)
+    // 59/87 @ 5ms
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int stations = gas.length;
+        // use a sliding window to find the ranges that can be traversed.
+        // if the e wraps around and reaches b, a circuit can be completed
+        int b = 0;
+        int e = 0;
+        int tank = gas[b] - cost[b];
+        while (b < stations) {
+            if (e - stations == b - 1 && tank >= 0) { // can make the entire circuit
+                return b;
+            } else if (b == e && tank < 0) {
+                e++;
+                tank += gas[e % stations] - cost[e % stations];
+                tank -= gas[b] - cost[b];
+                b++;
+            } else if (b == e) { // && tank >= 0
+                e++;
+                tank += gas[e % stations] - cost[e % stations];
+            } else if (tank < 0) {
+                tank -= gas[b] - cost[b];
+                b++;
+            } else { // tank >= 0
+                e++;
+                tank += gas[e % stations] - cost[e % stations];
+            } // if
+        } // while 
+        return -1;
+    } // canCompleteCircuit()
+    // 18/7 @ 15ms
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int stations = gas.length;
+        // dif is the gas left over after starting from station i and going to station i + 1
+        // if negative, cannot start at station i and get to station i + 1
+        int[] dif = new int[stations];
+        for (int i = 0; i < stations; i++) {
+            dif[i] = gas[i] - cost[i];
+        } // for i
+        // use a sliding window to find the ranges that can be traversed.
+        // if the e wraps around and reaches b, a circuit can be completed
+        int b = 0;
+        int e = 0;
+        int tank = dif[0];
+        while (b < stations) {
+            if (e - stations == b - 1 && tank >= 0) { // can make the entire circuit
+                return b;
+            } else if (b == e && tank < 0) {
+                e++;
+                tank += dif[e % stations];
+                tank -= dif[b];
+                b++;
+            } else if (b == e) { // && tank >= 0
+                e++;
+                tank += dif[e % stations];
+            } else if (tank < 0) {
+                tank -= dif[b];
+                b++;
+            } else { // tank >= 0
+                e++;
+                tank += dif[e % stations];
+            } // if
+        } // while 
+        return -1;
+    } // canCompleteCircuit()
+
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int stations = gas.length;
+        int[] dif = new int[stations];
+        for (int i = 0; i < stations; i++) {
+            dif[i] = gas[i] - cost[i];
+        } // for i
+        int b = 0;
+        int e = 0;
+        int gas = dif[0];
+        int maxGas = gas;
+        int maxGasStart = 0;
+        while (b < stations) {
+            if (false) {
+            } else if (b == e) { // at a single station
+                e++;
+                tank += dif[e % stations];
+            } else if (e % stations == b - 1) { // if e is right behind b
+                // could shortcut here?
+                tank -= dif[b];
+                b++;
+            } else if (tank < 0) { // current b to e cannot be made
+                tank -= dif[b];
+                b++;
+            } else { // tank >= 0
+                e++;
+                tank += dif[e % stations];
+            } // if
+            if (tank > maxGas) {
+                maxGas = tank;
+                maxGasStart = b;
+            } // if
+        } // while
+    } // canCompleteCircuit()
     public int canCompleteCircuit(int[] gas, int[] cost) {
         int stations = gas.length;
         int[] dif = new int[stations];
