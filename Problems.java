@@ -601,6 +601,51 @@ class Problems {
         } // for
         return res;
     } // getSum()
+    // 433. Minimum Genetic Mutation
+    // 93/31 @ 1ms
+    public int minMutation(String startGene, String endGene, String[] bank) {
+        // HashSet for seen; Queue for BFS
+        Set<String> seen = new HashSet<>();
+        Queue<String> q = new LinkedList<>();
+        // start with startGene: add to q and set
+        q.offer(startGene);
+        seen.add(startGene);
+        int mutations = 0;
+        // increment a counter, bfs the currently queued genes
+        // Repeat until endGene is found or queue is empty
+        while (!q.isEmpty()) {
+            mutations++;
+            int currentQ = q.size();
+            while (currentQ > 0) {
+                String currentGene = q.poll();
+                // loop through each gene in bank and add unseen singly differing genes to q and set
+                for (String gene : bank) {
+                    if (!seen.contains(gene) && isAdjacent(currentGene, gene)) {
+                        if (gene == endGene) { // path found
+                            return mutations;
+                        } // if
+                        // else q it up
+                        q.offer(gene);
+                        seen.add(gene);
+                    } // if
+                } // for gene
+                currentQ--;
+            } // while
+        } // while
+        return -1; // if a path to the endGene was never found
+    } // minMutation()
+
+    // Genes are adjacent if they differ in one and only one letter
+    private boolean isAdjacent(String currentGene, String gene) {
+        int differences = 0;
+        for (int i = 0; i < currentGene.length(); i++) {
+            if (currentGene.charAt(i) != gene.charAt(i)) {
+                differences++;
+            } // if
+        } // for i
+        return differences == 1;
+    } // isAdjacent()
+
     // 450. Delete Node in a BST
     // 100/79 @ 0m;
     public TreeNode deleteNode(TreeNode root, int key) {
