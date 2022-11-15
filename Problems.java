@@ -263,6 +263,25 @@ class Problems {
         
         return map.get(n);
     } // climbStairs()
+    // 99. Recover Binary Search Tree
+    //
+    public void recoverTree(TreeNode root) {
+        findBadNode(root, Integer.MAX_VALUE, Integer.MIN_VALUE);
+    } // recoverTree()
+    private TreeNode findBadNode(TreeNode root, int max, int min) {
+        if (root == null) {
+            return null;
+        } // if
+        if (root.val > max || root.val < min) {
+            return root;
+        } // if
+        TreeNode res = findBadNode(root.left, root.val, min);
+        if (res == null) {
+            res = findBadNode(root.right, max, root.val);
+        } // if
+        return res;
+    } // findBadNode
+
     // 100. Same Tree
     public boolean isSameTree(TreeNode p, TreeNode q) {
         if (p == null || q == null) {
@@ -406,6 +425,33 @@ class Problems {
         } // for i
         return nums;
     } // productExceptSelf()
+    // 257. Binary Tree Paths
+    // 95/52 @ 2ms
+    public List<String> binaryTreePaths(TreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        List<String> res = new LinkedList();
+        dfs(root, sb, res);
+        return res;
+    } // binaryTreePaths()
+    private void dfs(TreeNode root, StringBuilder sb, List<String> res) {
+        if (root == null) {
+            return;
+        } // if
+        sb.append(root.val);
+        if (root.left == null && root.right == null) { // if a leaf
+            res.add(sb.toString());
+        } else { // else not a leaf
+            sb.append("->");
+            dfs(root.left, sb, res);
+            dfs(root.right, sb, res);
+            sb.delete(sb.length() - 2, sb.length()); // remove "->"
+        } // if
+        // remove the root val from the str
+        while (sb.length() > 0 && sb.charAt(sb.length() - 1) != '>') {
+            sb.deleteCharAt(sb.length() - 1);
+        } // while
+    } // dfs()
+
     // 286. Missing Number
     // 73/59 @ 1 ms; 100/54 @ 0 ms
     public int missingNumber(int[] nums) {
@@ -754,6 +800,24 @@ class Problems {
             deleteIsland(grid, ix, iy + 1, m, n);
         return size;
     } // deleteIsland()
+    // 997. Find The Town Judge
+    // 57/25 @ 9ms
+    public int findJudge(int n, int[][] trust) {
+        int[] trusts = new int[n]; // how many people i trusts
+        int[] trustedBy = new int[n]; // how many people trust i
+        //boolean[] trustsSelf = new boolean[n]; // if i trusts themself
+        for (int[] t : trust) {
+            trusts[t[0] - 1]++;
+            trustedBy[t[1] - 1]++;
+        } // for t
+        for (int i = 1; i <= n; i++) {
+            if (trusts[i - 1] == 0 && trustedBy[i - 1] == n - 1) {
+                return i;
+            } // if
+        } // for i
+        return -1;
+    } // findJudge()
+
     // 1544. Make The String Great
     //
     public String makeGood(String s) {
