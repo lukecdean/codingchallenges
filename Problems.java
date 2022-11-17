@@ -601,6 +601,34 @@ class Problems {
         } // for
         return res;
     } // getSum()
+    // 430. Flatten a Multilevel Doubly Linked List
+    // 100/83 @ 0ms
+    public Node flatten(Node head) {
+        Stack<Node> stack = new Stack<>();
+        Node curr = head;
+        while (curr != null) { 
+            if (curr.child != null) { // has child
+                // if there is a next node of the node with a child, add it to the stack
+                if (curr.next != null) {
+                    stack.push(curr.next);
+                } // if
+                // make the child the next node
+                curr.next = curr.child;
+                curr.next.prev = curr;
+                curr.child = null;
+            } else if (curr.next == null) { // no next
+                // once the end of a set of nodes is reached,
+                // check the stack for any nodes that were previously removed and append them
+                if (!stack.isEmpty()) {
+                    curr.next = stack.pop();
+                    curr.next.prev = curr;
+                } // if
+            } // if
+            curr = curr.next;
+        } // while
+        return head;
+    } // flatten()
+
     // 433. Minimum Genetic Mutation
     // 93/31 @ 1ms
     public int minMutation(String startGene, String endGene, String[] bank) {
