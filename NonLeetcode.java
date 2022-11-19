@@ -53,5 +53,26 @@ class NonLeetcode {
     public int wordsWithPrefix(String prefix) {
        
     } // wordsWithPrefix()
+
+
+    public void enumerate(int n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            sb.append('0');
+            backtrack(sb, i);
+        } // for i
+    } // enumerate()
+
+    private void backtrack(StringBuilder sb, int n) {
+        while (n >= 0) {
+            System.out.println(sb);
+            backtrack(sb, n - 1);
+            sb.replaceCharAt(n, '1');
+            System.out.println(sb);
+            backtrack(sb, n - 1);
+            sb.replaceCharAt(n, '0');
+            n--;
+        } // while
+    } // backtrack()
 } // Class
 
