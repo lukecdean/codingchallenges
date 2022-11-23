@@ -500,6 +500,53 @@ public class Grind75 {
         return nums[m] == target ? m : -1;
     } // regularBinarySearch()
 
+    // 36. Valid Sudoku
+    // 46/93 @ 10ms
+    public boolean isValidSudoku(char[][] board) {
+        boolean[] set = new boolean[9];
+        boolean[] set2 = new boolean[9];
+        // check rows and cols simultainiously by checking [i][j] and [j][i]
+        for (int r = 0; r < 9; r++) {
+            set = new boolean[9];
+            set2 = new boolean[9];
+            for (int c = 0; c < 9; c++) {
+                if (board[r][c] != '.') {
+                    if (set[board[r][c] - '1'] == true) {
+                        return false;
+                    } else {
+                        set[board[r][c] - '1'] = true;
+                    } // if
+                } // if
+                if (board[c][r] != '.') {
+                    if (set2[board[c][r] - '1'] == true) {
+                        return false;
+                    } else {
+                        set2[board[c][r] - '1'] = true;
+                    } // if
+                } // if
+            } // for c
+        } // for r
+        // check subsquares
+        // <ssr/ssc> * 3 + 1 gives the center of a subsquare
+        // looping through dirs checks every space in the 3x3 centered on <ssr/ssc> * 3 + 1
+        int[] dirs = new int[]{0, 1, 1, -1, 1, 0, 0, -1, -1, 0};
+        for (int ssr = 0; ssr < 3; ssr++) {
+            for (int ssc = 0; ssc < 3; ssc++) {
+                set = new boolean[9];
+                for (int dir = 1; dir < dirs.length; dir++) {
+                    if (board[(ssr * 3 + 1) + dirs[dir]][(ssc * 3 + 1) + dirs[dir - 1]] != '.') {
+                        if (set[board[(ssr * 3 + 1) + dirs[dir]][(ssc * 3 + 1) + dirs[dir - 1]] - '1'] == true) {
+                            return false;
+                        } else {
+                            set[board[(ssr * 3 + 1) + dirs[dir]][(ssc * 3 + 1) + dirs[dir - 1]] - '1'] = true;
+                        } // if
+                    } // if
+                } // for dir
+            } // for ssc
+        } // for ssr
+        return true;
+    } // isValidSudoku()
+
     // 39. Combination Sum
     // backtracing
     // O()/O(1)
@@ -3653,4 +3700,4 @@ public class Grind75 {
         } // for
     } // rotNeighbors()
 
-} // class
+ // class
