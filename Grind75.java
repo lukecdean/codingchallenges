@@ -644,6 +644,32 @@ public class Grind75 {
         return la;
     } // permute()
 
+    // 49. Group Anagrams
+    // 5/83 @ 334ms
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            int[] counts = new int[26];
+            for (char c : s.toCharArray()) {
+                counts[c - 'a']++;
+            } // for c
+            String encoding = "";
+            for (int n : counts) {
+                encoding += (n % 1000) / 100;
+                encoding += (n % 100) / 10;
+                encoding += (n % 10);
+            } // for n
+            if (!map.containsKey(encoding)) {
+                List<String> l = new LinkedList();
+                map.put(encoding, l);
+            } // if
+            map.get(encoding).add(s);
+        } // for s
+        List<List<String>> res = new LinkedList<>();
+        res.addAll(map.values());
+        return res;
+    } // groupAnagrams()
+
     // 53. Maximum Subarray
     // 10/78 @ 4ms; 
     public int maxSubArray(int[] nums) {
