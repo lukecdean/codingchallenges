@@ -645,6 +645,72 @@ public class Grind75 {
     } // permute()
 
     // 49. Group Anagrams
+    // 61/38 @ 14ms
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            char[] encoding = new char[26];
+            for (char c : s.toCharArray()) {
+                encoding[c - 'a']++;
+            } // for c
+            String encoded = String.valueOf(encoding);
+            if (!map.containsKey(encoded)) {
+                List<String> l = new LinkedList();
+                map.put(encoded, l);
+            } // if
+            map.get(encoded).add(s);
+        } // for s
+        return new ArrayList<List<String>>(map.values());
+    } // groupAnagrams()
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<List<String>> map = new HashMap<>();
+    } // groupAnagrams()
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, int[]> counts = new HashMap<>();
+        List<String> l = new LinkedList<>();
+        for (String word : strs) {
+            l.add(word);
+            map.add(word, count(word));
+        } // for word
+        Queue<List<String>> q = new LinkedList<>();
+        q.offer(l);
+        for (int letter = 0; letter < 26; letter++) {
+            int qSize = q.size();
+            while (qSize >= 0) {
+                List<String> l = q.poll();
+                for (String word : l) {
+
+                } // for word
+
+                qSize--;
+            } // while qSize
+        } // for letter
+    } // groupAnagrams()
+    private int[] count(String s) {
+        int[] letterCounts = new int[26];
+        for (char c : s.toCharArray()) {
+            letterCounts[c - 'a']++;
+        } // for c
+        return letterCounts;
+    } // conut()
+
+    class LetterCount {
+        String word;
+        int[] counts;
+
+        public LetterCounts(String word) {
+            this.word = word;
+            this.counts = count(word);
+        } // LetterCounts()
+
+        private int[] count(String s) {
+            int[] letterCounts = new int[26];
+            for (char c : s.toCharArray()) {
+                letterCounts[c - 'a']++;
+            } // for c
+            return letterCounts;
+        } // conut()
+    } // class LetterCount
     // 5/83 @ 334ms
     public List<List<String>> groupAnagrams(String[] strs) {
         Map<String, List<String>> map = new HashMap<>();
@@ -664,6 +730,24 @@ public class Grind75 {
                 map.put(encoding, l);
             } // if
             map.get(encoding).add(s);
+        } // for s
+        List<List<String>> res = new LinkedList<>();
+        res.addAll(map.values());
+        return res;
+    } // groupAnagrams()
+    //
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<int[], List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            int[] counts = new int[26];
+            for (char c : s.toCharArray()) {
+                counts[c - 'a']++;
+            } // for c
+            if (!map.containsKey(counts)) {
+                List<String> l = new LinkedList();
+                map.put(counts, l);
+            } // if
+            map.get(counts).add(s);
         } // for s
         List<List<String>> res = new LinkedList<>();
         res.addAll(map.values());
@@ -1921,6 +2005,68 @@ public class Grind75 {
         } // for
         return stack.peek();
     } // evalRPN()
+
+    // 152. Maximum Product Subarray
+    // 82/38 @ 2ms
+    public int maxProduct(int[] nums) {
+        int b = 0;
+        int e = 0;
+        int cur = nums[0];
+        int max = nums[0];
+        while (b < nums.length - 1) {
+            if (b == e && nums[b] == 0) {
+                // subarray size 1 and on a 0
+                b++;
+                e++;
+                cur = nums[b];
+            } else if (e == nums.length - 1 || nums[e + 1] == 0) {
+                // at the end of a section
+                cur /= nums[b];
+                b++;
+                if (b > e) {
+                    e = b;
+                    cur = nums[b];
+                } // if
+            } else {
+                // subarray not at the end of a section
+                e++;
+                cur *= nums[e];
+            } // if
+            max = Math.max(max, cur);
+        } // while
+        return max;
+    } // maxProduct()
+    public int maxProduct(int[] nums) {
+        int b = 0;
+        int e = 0;
+        int cur = nums[0];
+        int max = nums[0];
+        while (b < nums.length - 1) {
+            if (b > e) {
+                e = b;
+                cur = nums[b];
+            } else if (e == nums.length - 1 || nums[e + 1] == 0) {
+                // may break the array up into sections separated by 0s
+                // when e makes is to the end of a section, contract the subarray from b
+                cur /= nums[b];
+                b++;
+            } else if (e == b) { // if the subarray only covers a single index
+                if (nums[b] == 0) { // if the single index is a 0, shift up the entire subarray
+                    e++;
+                    b++;
+                    cur = nums[b];
+                } else { // else extend the subarray
+                    e++;
+                    cur *= nums[e];
+                } // if
+            } else { // extend the subarray
+                e++;
+                cur *= nums[e];
+            } // if
+            max = Math.max(max, cur);
+        } // while
+        return max;
+    } // maxProduct()
 
     // 155. Min Stack
     // O(1) time for each method
