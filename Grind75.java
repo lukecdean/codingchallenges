@@ -2550,6 +2550,77 @@ public class Grind75 {
         } // find()
     } // class Trie
 
+    // 211. Design Add and Search Words Data Structure
+    // search() - O(26^3 * wordLength)/O()
+    // 74/58 @ 841ms
+    class WordDictionary {
+        TrieNode root;
+
+        public WordDictionary() {
+            root = new TrieNode();
+        }
+
+        public void addWord(String word) {
+            TrieNode cur = root;
+            for (char c : word.toCharArray()) {
+                if (cur.child(c) == null) {
+                    cur.createChild(c);
+                } // if
+                cur = cur.child(c);
+            } // for c
+            cur.setEndOfWord();
+        } // addWord()
+
+        public boolean search(String word) {
+            return searchHelper(word, 0, root);
+        }
+
+        private boolean searchHelper(String word, int place, TrieNode cur) {
+            if (place == word.length()) {
+                return cur.isEndOfWord();
+            } else if (word.charAt(place) != '.') {
+                if (cur.child(word.charAt(place)) == null) {
+                    return false;
+                } else {
+                    return searchHelper(word, place + 1, cur.child(word.charAt(place)));
+                } // if
+            } else { // word.charAt(place) == '.'
+                for (TrieNode node : cur.children) {
+                    if (node != null && searchHelper(word, place + 1, node)) {
+                        return true;
+                    } // if
+                } // for node
+                return false;
+            } // if
+        } // searchHelper()
+    } // class WordDictionary
+
+    class TrieNode {
+        TrieNode[] children;
+        boolean endOfWord;
+
+        TrieNode() {
+            children = new TrieNode[26];
+            endOfWord = false;
+        } // TrieNode()
+
+        public TrieNode child(char c) {
+            return children[c - 'a'];
+        } // TrieNode()
+
+        public void createChild(char c) {
+            children[c - 'a'] = new TrieNode();
+        } // createChild()
+
+        public void setEndOfWord() {
+            endOfWord = true;
+        } // setEndOfWord()
+        
+        public boolean isEndOfWord() {
+            return endOfWord;
+        } // isEndOfWord()
+    } // class
+
     // 217. Contains Duplicate
     // 89/72 @ 8ms; 
     public boolean containsDuplicate(int[] nums) {
