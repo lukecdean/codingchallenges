@@ -3239,6 +3239,157 @@ public class Grind75 {
         return false;
     } // backtrack()
 
+    // 417. Pacific Atlantic Water Flow
+    //
+    class Solution {
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        int m = heights.length;
+        int n = heights[0].length;
+        int[][] reachesAtlantic = new int[m][n]; // 0 unkown, -1 no, 1 yes
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                reaches(heights, r, c, reachesAtlantic, false);
+            } // for c
+        } // for r
+        int[][] reachesPacific = new int[m][n]; // 0 unkown, -1 no, 1 yes
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                reaches(heights, r, c, reachesPacific, true);
+            } // for c
+        } // for r
+        List<List<Integer>> res = new ArrayList<>();
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                if (reachesAtlantic[r][c] == 1 && reachesPacific[r][c] == 1) {
+                    List<Integer> l = new ArrayList<>(2);
+                    l.add(r);
+                    l.add(c);
+                    res.add(l);
+                } // if
+            } // for c
+        } // for r
+        return res;
+    } // pacificAtlantic()
+
+    // atlantic == true if flowing towards atlantic, else pacific
+    private boolean reaches(int[][] heights, int r, int c, int[][] reaches, boolean atlantic) {
+        if (reaches[r][c] != 0) {
+            return reaches[r][c] == 1;
+        } else {
+            // assume it doesn't reach to avoid checking the same spaces again
+            reaches[r][c] = -1;
+        } // if
+
+        if (atlantic == true && (r == heights.length - 1 || c == heights[0].length - 1)) {
+            reaches[r][c] = 1;
+        } else if (atlantic == false && (r == 0 || c == 0)) {
+            reaches[r][c] = 1;
+        } else {
+            boolean thisReaches = false;
+            int[] dirs = new int[]{0, -1, 0, 1, 0};
+            for (int dir = 1; thisReaches == false && dir < dirs.length; dir++) {
+                int nextR = r + dirs[dir];
+                int nextC = c + dirs[dir - 1];
+                if (canFlow(heights, r, c, nextR, nextC)) {
+                    thisReaches = reaches(heights, nextR, nextC, reaches, atlantic);
+                } // if
+            } // for dirs
+            reaches[r][c] = thisReaches ? 1 : -1;
+        } // if
+        return reaches[r][c] == 1;
+    } // reaches()
+
+    private boolean canFlow(int[][] heights, int r1, int c1, int r2, int c2) {
+        // bounds check
+        if (r1 < 0 || heights.length <= r1 || c1 < 0 || heights[0].length <= c1 ||
+            r2 < 0 || heights.length <= r2 || c2 < 0 || heights[0].length <= c2) {
+            return false;
+            } // if
+        return (heights[r1][c1] >= heights[r2][c2]);
+    } // canFlow()
+    } // Solution
+
+
+
+    class Solution {
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        int m = heights.length;
+        int n = heights[0].length;
+        boolean[][] reachesPacific = new boolean[m][n]; // if a space can reach the Pacific
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                reachesPacific(heights, r, c, reachesPacific);
+            } // for c
+        } // for r
+        boolean[][] reachesAtlantic = new boolean[m][n]; // if a space can reach the Atlantic
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                reachesAtlantic(heights, r, c, reachesAtlantic);
+            } // for c
+        } // for r
+        List<List<Integer>> res = new ArrayList<>();
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                if (reachesPacific[r][c] && reachesAtlantic[r][c]) {
+                    List<Integer> l = new ArrayList<>(2);
+                    l.add(r);
+                    l.add(c);
+                    res.add(l);
+                } // if
+            } // for c
+        } // for r
+        return res;
+    } // pacificAtlantic()
+
+    private boolean reachesPacific(int[][] heights, int r, int c, boolean[][] reaches) {
+        if (reaches[r][c] == true) {
+            return true;
+        } else if (r == 0 || c == 0) {
+            reaches[r][c] = true;
+            return true;
+        } else {
+            if (canFlow(heights, r, c, r - 1, c) && reachesPacific(heights, r - 1, c, reaches) ||
+                canFlow(heights, r, c, r, c - 1) && reachesPacific(heights, r, c - 1, reaches) ||
+                canFlow(heights, r, c, r + 1, c) && reachesPacific(heights, r + 1, c, reaches) ||
+                canFlow(heights, r, c, r, c + 1) && reachesPacific(heights, r, c + 1, reaches)) {
+                    reaches[r][c] = true;
+                    return true;
+            } else {
+                return false;
+            } // if 
+        } // if
+    } // reachesPacific()
+
+    private boolean reachesAtlantic(int[][] heights, int r, int c, boolean[][] reaches) {
+        if (reaches[r][c] == true) {
+            return true;
+        } else if (r == heights.length - 1 || c == heights[0].length - 1) {
+            reaches[r][c] = true;
+            return true;
+        } else {
+            if (canFlow(heights, r, c, r + 1, c) && reachesAtlantic(heights, r + 1, c, reaches) ||
+                canFlow(heights, r, c, r, c + 1) && reachesAtlantic(heights, r, c + 1, reaches) ||
+                canFlow(heights, r, c, r - 1, c) && reachesAtlantic(heights, r - 1, c, reaches) ||
+                canFlow(heights, r, c, r, c - 1) && reachesAtlantic(heights, r, c - 1, reaches)) {
+                    reaches[r][c] = true;
+                    return true;
+            } else {
+                return false;
+            } // if 
+        } // if
+    } // reachesPacific()
+
+
+    private boolean canFlow(int[][] heights, int r1, int c1, int r2, int c2) {
+        // bounds check
+        if (r1 < 0 || heights.length <= r1 || c1 < 0 || heights[0].length <= c1 ||
+            r2 < 0 || heights.length <= r2 || c2 < 0 || heights[0].length <= c2) {
+            return false;
+            } // if
+        return (heights[r1][c1] >= heights[r2][c2]);
+    } // canFlow()
+    }
+
     // 438. Find All Anagrams in a String
     // O(n)/O(m)
     // 48/35 @ 35ms
