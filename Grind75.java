@@ -439,6 +439,37 @@ public class Grind75 {
         return mappings;
     } // getMappings()
 
+    // 19. Remove Nth Node From End of List
+    // O(n)/O(1)
+    // 100/92 @ 0ms
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        /*
+        if (head.next == null) { // if only 1 element
+            return null;
+        } // if
+        */
+
+        ListNode fast = head;
+        ListNode slow = head;
+
+        // send fast n nodes down the list
+        for (int i = 0; i < n; i++) {
+            fast = fast.next;
+        } // for i
+        // move fast and slow together until fast gets to the end
+        if (fast == null) { // n == size
+            head = head.next;
+            return head;
+        } // if
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        } // while
+        // remove the node
+        slow.next = slow.next.next;
+        return head;
+    } // removeNthFromEnd()
+
     // 21. Merge Two Sorted Lists
     // 80/29
     public ListNode mergeTwoLists(ListNode list1, ListNode list2) {
@@ -3004,6 +3035,19 @@ public class Grind75 {
         } // while
         return mid;
     } // firstBadVersion()
+
+    // 287. Find the Duplicate Number
+    //
+    public int findDuplicate(int[] nums) {
+        int sum = 0;
+        for (int i : nums) {
+            sum += i;
+        } // for i
+        // Gauss' 
+        int n = nums.length - 1;
+        int gauss = (n * (n + 1)) / 2;
+        return sum - gauss;
+    } // findDuplicate()
 
     // 310. Minimum Height Trees
     //
