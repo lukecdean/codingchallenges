@@ -263,6 +263,10 @@ class Problems {
         
         return map.get(n);
     } // climbStairs()
+    // 79. Word Search
+    //
+    public boolean exist(char[][] board, String word) {
+    } // exist()
     // 99. Recover Binary Search Tree
     //
     public void recoverTree(TreeNode root) {
@@ -390,6 +394,89 @@ class Problems {
         head.next = null;
         return n; 
     } // reverseList()
+    // 212. Word Search II
+    //
+    {
+    public List<String> findWords(char[][] board, String[] words) {
+        int m = board.length;
+        int n = board[0].length;
+        // build the Trie
+        Trie t = new Trie();
+        for (String word : words) {
+            Trie.addWord(t, word);
+        } // for word
+        List<String> res = new ArrayList<>();
+        // scan through the board seeing if that letter starts a word
+        for (int r = 0; r < m; r++) {
+            for (int c = 0; c < n; c++) {
+                // if the letter is, see if any adjacent chars are children of the start char
+                // build a string along the way to add to res when an end is encounter
+                if (t.contains(board[r][c])) {
+                    StringBuilder sb = new StringBuilder();
+                    find(t, sb, res, board, r, c);
+                } // if
+            } // for c
+        } // for r
+        return res;
+    } // findWords()
+    private void find(Trie t, StringBuilder sb, List<String> res, char[][] board, int r, int c) {
+        // add current letter
+        sb.append(board[r][c]);
+        board[r][c] = 0; // so this space won't be rechecked
+        // if a whole word has been found
+        if (t.isEnd()) {
+            res.add(sb.toString());
+        } // if
+        // search surrounding letters
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int i = 1; i < dirs.length; i++) {
+            int nextR = r + dirs[i];
+            int nextC = c + dirs[i - 1];
+            if (validSpace(board, nextR, nextC) &&
+                    t.contains(board[nextR][nextC])) {
+                find(t.get(board[nextR][nextC]), sb, res, board, nextR, nextC);
+            } // if
+        } // for i
+        board[r][c] = sb.charAt(sb.length() - 1);
+        sb.deleteCharAt(sb.length() - 1);
+    } // find()
+    private boolean validSpace(char[][] board, int r, int c) {
+        return !(r < 0 || board.length <= r ||
+               c < 0 || board[0].length <= c ||
+               board[r][c] == 0);
+    } // validSpace()
+    class Trie {
+        Trie[] children;
+        boolean end;
+
+        Trie() {
+            children = new Trie[26];
+            end = false;
+        } // Trie()
+        boolean isEnd() {
+            return end;
+        } // isEnd()
+        boolean contains(char c) {
+            return children[c - 'a'] != null;
+        } // contains
+        Trie get(char c) {
+            return children[c - 'a'];
+        } // getChild()
+        void add(char c) {
+            children[c - 'a'] = new Trie();
+        } // add()
+        static void addWord(Trie t, String s) {
+            for (char c : s.toCharArray()) {
+                if (!t.contains(c)) {
+                    t.add(c);
+                } // if
+                t = t.get(c);
+            } // for c
+            t.end = true;
+        } // addWord()
+    } // class Trie
+    } // mark
+
     // 226. Invert Binary Tree
     // 100/74
     public TreeNode invertTree(TreeNode root) {
