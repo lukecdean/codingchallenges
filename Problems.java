@@ -395,8 +395,8 @@ class Problems {
         return n; 
     } // reverseList()
     // 212. Word Search II
-    //
-    {
+    // 6/7 @ 2189ms
+    class Solution {
     public List<String> findWords(char[][] board, String[] words) {
         int m = board.length;
         int n = board[0].length;
@@ -406,6 +406,7 @@ class Problems {
             Trie.addWord(t, word);
         } // for word
         List<String> res = new ArrayList<>();
+        Set<String> resSet = new HashSet<>();
         // scan through the board seeing if that letter starts a word
         for (int r = 0; r < m; r++) {
             for (int c = 0; c < n; c++) {
@@ -413,28 +414,30 @@ class Problems {
                 // build a string along the way to add to res when an end is encounter
                 if (t.contains(board[r][c])) {
                     StringBuilder sb = new StringBuilder();
-                    find(t, sb, res, board, r, c);
+                    find(t, sb, res, resSet, board, r, c);
                 } // if
             } // for c
         } // for r
         return res;
     } // findWords()
-    private void find(Trie t, StringBuilder sb, List<String> res, char[][] board, int r, int c) {
+    private void find(Trie t, StringBuilder sb, List<String> res, Set<String> resSet, char[][] board, int r, int c) {
         // add current letter
         sb.append(board[r][c]);
+        // move down trie
+        t = t.get(board[r][c]);
         board[r][c] = 0; // so this space won't be rechecked
         // if a whole word has been found
-        if (t.isEnd()) {
+        if (t.isEnd() && !resSet.contains(sb.toString())) {
             res.add(sb.toString());
+            resSet.add(sb.toString());
         } // if
         // search surrounding letters
         int[] dirs = new int[]{0, -1, 0, 1, 0};
         for (int i = 1; i < dirs.length; i++) {
             int nextR = r + dirs[i];
             int nextC = c + dirs[i - 1];
-            if (validSpace(board, nextR, nextC) &&
-                    t.contains(board[nextR][nextC])) {
-                find(t.get(board[nextR][nextC]), sb, res, board, nextR, nextC);
+            if (validSpace(board, nextR, nextC) && t.contains(board[nextR][nextC])) {
+                find(t, sb, res, resSet, board, nextR, nextC);
             } // if
         } // for i
         board[r][c] = sb.charAt(sb.length() - 1);
