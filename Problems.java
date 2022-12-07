@@ -981,6 +981,112 @@ class Problems {
         return -1;
     } // findJudge()
 
+    // 1396. Design Underground System
+    //
+    class UndergroundSystem {
+
+        class CheckIn {
+            int checkInTime;
+            String checkInStation;
+
+            CheckIn(int checkInTime, String checkInStation) {
+                this.checkInTime = checkInTime;
+                this.checkInStation = checkInStation;
+            } // CheckIn()
+
+        } // class CheckIn
+
+        class AverageTrip {
+            int numberOfTrips;
+            int totalTimeOfTheTrips;
+
+            AverageTrip() {
+            } // AverageTrip()
+
+            void addTrip(int checkInTime, int checkOutTime) {
+                totalTimeOfTheTrips += checkOutTime - checkInTime;
+                numberOfTrips++;
+            } // addTrip()
+
+            double getAverageTime() {
+                return Double.valueOf(totalTimeOfTheTrips) / Double.valueOf(numberOfTrips);
+            } // getAverageTime()
+        } // class AverageTrip
+
+        Map<Integer, CheckIn> checkIns;
+        Map<String, AverageTrip> averageTrips;
+
+        public UndergroundSystem() {
+            checkIns = new HashMap<>();
+            averageTrips = new HashMap<>();
+        } // UndergroundSystem()
+
+        public void checkIn(int id, String stationName, int t) {
+            // if already checked in
+            if (checkIns.containsKey(id)) {
+                return;
+            } // if
+            CheckIn cin = new CheckIn(t, stationName);
+            checkIns.put(id, cin);
+        } // checkIn()
+
+        public void checkOut(int id, String stationName, int t) {
+            if (!checkIns.containsKey(id)) {
+                return;
+            } // if
+            CheckIn cin = checkIns.remove(id);
+            String tripStations = cin.checkInStation + '#' + stationName;
+            AverageTrip at = averageTrips.getOrDefault(tripStations, new AverageTrip());
+            at.addTrip(cin.checkInTime, t);
+        } // checkOut()
+
+        public double getAverageTime(String startStation, String endStation) {
+            AverageTrip at = averageTrips.get(startStation + '#' + endStation);
+            return at.getAverageTime();
+        } // getAverageTime()
+    } // class UndergroundSystem
+
+    // 1472. Design Browser History
+    // 91/92 @ 56ms
+    class BrowserHistory {
+        List<String> history;
+        int placeInHistory;
+        int endOfHistory;
+
+        public BrowserHistory(String homepage) {
+            history = new ArrayList<>();
+            history.add(homepage);
+            placeInHistory = 0;
+            endOfHistory = 0;
+        }
+
+        // no: O(amortized constant)/
+        // usually consant but sometimes linear
+        public void visit(String url) {
+            placeInHistory++;
+            endOfHistory = placeInHistory;
+            history.add(placeInHistory, url);
+        }
+
+        // O(n)/
+        public String back(int steps) {
+            placeInHistory -= steps;
+            if (placeInHistory < 0) {
+                placeInHistory = 0;
+            } // if
+            return history.get(placeInHistory);
+        }
+
+        // O(n)
+        public String forward(int steps) {
+            placeInHistory += steps;
+            if (placeInHistory > endOfHistory) {
+                placeInHistory = endOfHistory;
+            } // if
+            return history.get(placeInHistory);
+        }
+    } // class BrowserHistory
+    
     // 1544. Make The String Great
     //
     public String makeGood(String s) {
@@ -997,6 +1103,60 @@ class Problems {
             } // if
         } // for
     } // makeGood()
+
+    // 1657. Determine If Two Strings Are Close
+    // 
+    public boolean closeStrings(String word1, String word2) {
+
+    } // closeStrings()
+    public boolean closeStrings(String word1, String word2) {
+        if (word1.length() != word2.length()) {
+            return false;
+        } // if
+        int[] word1Counts = new int[26];
+        int[] word2Counts = new int[26];
+
+        for (int i = 0; i < word1.length(); i++) {
+            word1Counts[word1.charAt(i) - 'a']++;
+            word2Counts[word2.charAt(i) - 'a']++;
+        } // for i
+
+        int val = 0;
+        for (int i = 0; i < word1Counts.length; i++) {
+            //System.out.printf("w1: %d; w2: :d\n", word1Counts[i], word1Counts[i]);
+            if (word1Counts[i] != 0) val ^= word1Counts[i];
+            if (word2Counts[i] != 0) val ^= word2Counts[i];
+        } // for i
+        
+        return val == 0;
+
+        /*
+        Map<Integer, Integer> countCounts = new HashMap<>();
+        for (int i = 0; i < word1.counts; i++) {
+            int w1 = countCounts.getOrDefault(word1Counts[i], 0)
+            int w2 = countCounts.getOrDefault(word2Counts[i], 0)
+            countCounts.put(word1Counts[i], w1);
+            countCounts.put(word2Counts[i], w2);
+        } // for i
+
+        for (int n : countCounts) {
+            if (n != 0) {
+                return false;
+            } // if
+        } // for n
+
+        return true;
+        */
+
+        /*
+        int val = 0;
+        for (int i = 0; i < word1Counts.length; i++) {
+           val ^= word1Counts[i];
+            val ^= word2Counts[i];
+        } // for i
+        return val == 0;
+        */
+    } // closeStrings()
 
     // 1662. Check If Two String Arrays are Equivalent
     // 96/99 @ 1ms

@@ -3037,7 +3037,24 @@ public class Grind75 {
     } // firstBadVersion()
 
     // 287. Find the Duplicate Number
-    //
+    // 75/43 @ 9ms
+    public int findDuplicate(int[] nums) {
+        int fast = 0;
+        int slow = 0;
+        // find the cycle
+        do {
+            fast = nums[nums[fast]];
+            slow = nums[slow];
+        } while (fast != slow);
+        // find the entrant point
+        slow = 0;
+        while (fast != slow) {
+            fast = nums[fast];
+            slow = nums[slow];
+        } // while
+        return fast;
+    } // findDuplicate()
+    // works if there is a single dup
     public int findDuplicate(int[] nums) {
         int sum = 0;
         for (int i : nums) {
