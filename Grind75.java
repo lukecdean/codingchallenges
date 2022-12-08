@@ -3708,6 +3708,48 @@ public class Grind75 {
         } // compareTo()
     } // class Task
 
+    // 692. Top K Frequent Words
+    //
+    public List<String> topKFrequent(String[] words, int k) {
+        Map<String, Integer> wordCounts = new HashMap<>();
+        for (String word : words) {
+            wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
+        } // for
+        PriorityQueue<WordFrequency> pq = new PriorityQueue<>();
+        for (String key : wordCounts.keySet()) {
+            WordFrequency wf = new WordFrequency(key, wordsCounts.get(key));
+            pq.offer(wf);
+        } // for key
+        List<String> res = new ArrayList<>(k);
+        List<String> sameFrequency = new ArrayList<>();
+        int currentFrequency = -1;
+        while (k > 0) {
+            WordFrequency wf = pq.poll();
+            if (wf.frequency != currentFrequency) {
+                res.addAll(sameFrequency);
+                sameFrequency.clear();
+                currentFrequency = wf.frequency;
+            } // if
+            sameFrequency.add(wf.word);
+            k--;
+        } // while k
+        res.addAll(sameFrequency);
+        return res;
+    } // topKFrequent()
+    class WordFrequency {
+        String word;
+        int frequency;
+
+        WordFrequency(String word, int frequency) {
+            this.word = word;
+            this.frequency = frequency;
+        } // WordFreqeucy()
+
+        int compareTo(WordFrequency wf) {
+            return this.frequency - wf.frequency;
+        } // compareTo()
+    } // class WordFrequency
+
     // 704. Binary Search
     // 100/73 O(log(n))
     public int search(int[] nums, int target) {
