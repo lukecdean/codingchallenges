@@ -2,25 +2,174 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 import java.io.File;
 import java.util.Arrays;
 
 class AdventOfCode2022 {
 
+    static Scanner input;
+
     public static void main(String[] args) {
+        input = getInput("input/" + args[0] + ".txt");
         switch (args[0]) {
+            case ("1-1"):
+                dayOneOne();
+                break;
+            case ("1-2"):
+                dayOneTwo();
+                break;
+            case ("2-1"):
+                dayTwoOne();
+                break;
+            case ("2-2"):
+                dayTwoTwo();
+                break;
+            case ("3-1"):
+                //dayThreeOne();
+                break;
+            case ("3-2"):
+                //dayThreeTwo();
+                break;
+            case ("4-1"):
+                //dayFourOne();
+                break;
+            case ("4-2"):
+                //dayFourTwo();
+                break;
+            case ("5-1"):
+                //dayFiveOne();
+                break;
+            case ("5-2"):
+                //dayFiveTwo();
+                break;
+            case ("6-1"):
+                //daySixOne();
+                break;
+            case ("6-2"):
+                //daySixTwo();
+                break;
             case ("7-1") :
-                daySevenOne();
+                //daySevenOne();
+                break;
+            case ("7-2"):
+                //daySevenTwo();
+                break;
+            case ("8-1"):
+                //dayEightOne();
+                break;
+            case ("8-2"):
+                //dayEightTwo();
                 break;
             case ("9-1") :
-                dayNineOne();
+                //dayNineOne();
                 break;
             case ("9-2") :
-                dayNineTwo();
+                //dayNineTwo();
                 break;
         } // switch
     } // main()
+
+    // getInput()
+    static Scanner getInput(String filePath) {
+        try {
+            Scanner input;
+            input = new Scanner(new File(filePath));
+            return input;
+        } catch (Exception e) {
+            System.out.println(e);
+            System.exit(1);
+        } // try
+        return null;
+    } // getInput()
+
+    static void dayX() {
+        return;
+    } // dayX()
+
+    static void dayOneOne() {
+        int max = 0;
+        int cur = 0;
+        String line;
+        while (input.hasNextLine()) {
+            line = input.nextLine();
+            if (line.length() == 0) {
+                max = Math.max(max, cur);
+                cur = 0;
+                continue;
+            } // if
+            cur += Integer.parseInt(line);
+        } // while
+        System.out.println(max);
+    } // dayX()
+
+    static void dayOneTwo() {
+        PriorityQueue<Integer> heap = new PriorityQueue<>((Integer a, Integer b) -> b - a);
+        int cur = 0;
+        String line;
+        while (input.hasNextLine()) {
+            line = input.nextLine();
+            if (line.length() == 0) {
+                heap.offer(cur);
+                cur = 0;
+                continue;
+            } else {
+                cur += Integer.parseInt(line);
+            } // if
+        } // while
+        int sum = 0;
+        sum += heap.poll();
+        sum += heap.poll();
+        sum += heap.poll();
+        System.out.println(sum);
+    } // dayOneTwo()
+
+    static void dayTwoOne() {
+        /*
+         * A X   0
+         * B Y   1
+         * C Z   2
+         */
+        int score = 0;
+        int elf;
+        int you;
+        String line;
+        while (input.hasNextLine()) {
+            line = input.nextLine();
+            elf = line.charAt(0) - 'A';
+            you = line.charAt(2) - 'X';
+            //System.out.printf("e: %d, y: %d\n", elf, you);
+
+            for (int i = 0; i <= 2; i++) {
+                if (((you + 4 - i) % 3) == elf) {
+                    score += i * 3;
+                    //System.out.println("you == elf");
+                } // if
+            } // for i
+
+            score += you + 1;
+            //System.out.println(score);
+        } // while
+        System.out.println(score);
+    } // dayTwoOne()
+
+    static void dayTwoTwo() {
+        int score = 0;
+        int elf;
+        int outcome;
+        String line;
+        while (input.hasNextLine()) {
+            line = input.nextLine();
+            elf = line.charAt(0) - 'A';
+            outcome = line.charAt(2) - 'X';
+
+            score += ((elf + 2 + outcome) % 3) + 1;
+            score += outcome * 3;
+        } // while
+
+        System.out.println(score);
+    } // dayTwoTwo()
 
     // --- Day 7: No Space Left On Device ---
     static void daySevenOne() {
@@ -131,18 +280,6 @@ class AdventOfCode2022 {
             return n;
         } // get()
     } // class IntegerPointer
-
-    static Scanner getInput(String filePath) {
-        try {
-            Scanner input;
-            input = new Scanner(new File(filePath));
-            return input;
-        } catch (Exception e) {
-            System.out.println(e);
-            System.exit(1);
-        } // try
-        return null;
-    } // getInput()
 
     static void dayNineOne() {
         Scanner input = getInput("./input/9-1.txt");
