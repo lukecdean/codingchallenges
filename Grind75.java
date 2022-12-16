@@ -3717,7 +3717,7 @@ public class Grind75 {
         } // for
         PriorityQueue<WordFrequency> pq = new PriorityQueue<>();
         for (String key : wordCounts.keySet()) {
-            WordFrequency wf = new WordFrequency(key, wordsCounts.get(key));
+            WordFrequency wf = new WordFrequency(key, wordCounts.get(key));
             pq.offer(wf);
         } // for key
         List<String> res = new ArrayList<>(k);
@@ -3726,6 +3726,7 @@ public class Grind75 {
         while (k > 0) {
             WordFrequency wf = pq.poll();
             if (wf.frequency != currentFrequency) {
+                sameFrequency.sort((String a, String b) -> a.compareTo(b));
                 res.addAll(sameFrequency);
                 sameFrequency.clear();
                 currentFrequency = wf.frequency;
@@ -3733,10 +3734,13 @@ public class Grind75 {
             sameFrequency.add(wf.word);
             k--;
         } // while k
+        sameFrequency.sort((String a, String b) -> a.compareTo(b));
+        //sameFrequency.sort();
         res.addAll(sameFrequency);
         return res;
     } // topKFrequent()
-    class WordFrequency {
+
+    class WordFrequency implements Comparable<WordFrequency> {
         String word;
         int frequency;
 
@@ -3745,7 +3749,7 @@ public class Grind75 {
             this.frequency = frequency;
         } // WordFreqeucy()
 
-        int compareTo(WordFrequency wf) {
+        public int compareTo(WordFrequency wf) {
             return this.frequency - wf.frequency;
         } // compareTo()
     } // class WordFrequency

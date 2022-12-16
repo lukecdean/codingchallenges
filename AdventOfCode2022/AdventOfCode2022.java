@@ -3,6 +3,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Stack;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
 import java.util.Arrays;
@@ -406,20 +409,114 @@ class AdventOfCode2022 {
 
 
     static void dayFiveOne() {
-        int res = 0;
-        String line;
+        List<Stack<Character>> stacks = new ArrayList<>();
+        // build the initial stacks
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            String line = input.nextLine();
+            if (line.length() == 0) { // finished making stacks
+                break;
+            } // if
+            for (int stack = 0; (stack * 4) + 1 < line.length(); stack++) {
+                if (stacks.size() <= stack) { // initialize the stack
+                    stacks.add(new Stack<>());
+                } // if
+                char crate = line.charAt((stack * 4) + 1);
+                if (Character.isLetter(crate)) {
+                    stacks.get(stack).push(crate);
+                    // crates will be in reverse order
+                } // if
+            } // for stack
         } // while
+
+        reverseCrateStacks(stacks);
+
+        //input.useDelimiter("[^0-9]");
+
+        while (input.hasNext()) {
+            input.next();
+            int count = input.nextInt();
+            input.next();
+            int from = input.nextInt();
+            from--; // 0 indexed
+            input.next();
+            int to = input.nextInt();
+            to--; // 0 indexed
+
+            while (count >= 1) {
+                char movingCrate = stacks.get(from).pop();
+                stacks.get(to).push(movingCrate);
+
+                count--;
+            } // while
+        } // while
+
+        String res = "";
+        for (Stack<Character> stack : stacks) {
+            res += stack.pop();
+        } // for stack
         System.out.println(res);
     } // dayFiveOne()
 
+    static void reverseCrateStacks(List<Stack<Character>> stacks) {
+        for (int i = 0; i < stacks.size(); i++) {
+            Stack<Character> newStack = new Stack<>();
+            while (!stacks.get(i).empty()) {
+                newStack.push(stacks.get(i).pop());
+            } // while
+            stacks.set(i, newStack);
+        } // for i
+    } // rCS()
+
     static void dayFiveTwo() {
-        int res = 0;
-        String line;
+        List<Stack<Character>> stacks = new ArrayList<>();
+        // build the initial stacks
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            String line = input.nextLine();
+            if (line.length() == 0) { // finished making stacks
+                break;
+            } // if
+            for (int stack = 0; (stack * 4) + 1 < line.length(); stack++) {
+                if (stacks.size() <= stack) { // initialize the stack
+                    stacks.add(new Stack<>());
+                } // if
+                char crate = line.charAt((stack * 4) + 1);
+                if (Character.isLetter(crate)) {
+                    stacks.get(stack).push(crate);
+                    // crates will be in reverse order
+                } // if
+            } // for stack
         } // while
+
+        reverseCrateStacks(stacks);
+
+        //input.useDelimiter("[^0-9]");
+
+        // Moving crates
+        while (input.hasNext()) {
+            input.next();
+            int count = input.nextInt();
+            input.next();
+            int from = input.nextInt();
+            from--; // 0 indexed
+            input.next();
+            int to = input.nextInt();
+            to--; // 0 indexed
+
+            Stack<Character> temp = new Stack<>();
+            while (count >= 1) {
+                char movingCrate = stacks.get(from).pop();
+                temp.push(movingCrate);
+                count--;
+            } // while
+            while (!temp.isEmpty()) {
+                stacks.get(to).push(temp.pop());
+            } // while
+        } // while
+
+        String res = "";
+        for (Stack<Character> stack : stacks) {
+            res += stack.pop();
+        } // for stack
         System.out.println(res);
     } // dayFiveTwo()
 

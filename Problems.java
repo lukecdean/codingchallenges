@@ -981,6 +981,63 @@ class Problems {
         return -1;
     } // findJudge()
 
+    // 1143. Longest Common Subsequence
+    //
+    public int longestCommonSubsequence(String a, String b) {
+        int afm = -1; // first common char in a
+        int bfm = -1; // first common char in b
+        // find fm
+        int[] firstOccurenceA = new int[26];
+        Arrays.fill(firstOccurenceA, -1);
+        int[] firstOccurenceB = new int[26];
+        Arrays.fill(firstOccurenceB, -1);
+        for (int i = 0; i < a.length() || i < b.length(); i++) {
+            if (i < a.length()) {
+                if (firstOccurenceB[a.charAt(i) - 'a'] != -1) { // found match
+                    afm = i;
+                    bfm = firstOccurenceB[a.charAt(i) - 'a'];
+                    break;
+                } else if (firstOccurenceA[a.charAt(i) - 'a'] == -1) {
+                    firstOccurenceA[a.charAt(i) - 'a'] = i;
+                } // if
+            } // if
+            if (i < b.length()) {
+                if (firstOccurenceA[b.charAt(i) - 'a'] != -1) { // found match
+                    bfm = i;
+                    afm = firstOccurenceA[b.charAt(i) - 'a'];
+                    break;
+                } else if (firstOccurenceB[b.charAt(i) - 'a'] == -1) {
+                    firstOccurenceB[b.charAt(i) - 'a'] = i;
+                } // if
+            } // if
+        } // for 
+        if (afm == -1) { // no matching chars
+            return 0;
+        } // if
+        //System.out.printf("afm: %d, bfm: %d\n", afm, bfm);
+
+        int res = 0;
+        // find subsequence for a of b and b of a
+        for (int i = 0; i < 2; i++) {
+            int ap = afm;
+            for (int bp = bfm; bp < b.length(); bp++) {
+                if (a.charAt(ap) == b.charAt(bp)) {
+                    ap++;
+                } // if
+            } // for bp
+            res = Math.max(res, ap - afm);
+
+            // swap
+            String temp = a;
+            a = b;
+            b = temp;
+            int tempInt = afm;
+            afm = bfm;
+            bfm = tempInt;
+        } // for i
+        return res;
+    } // lCS()
+
     // 1396. Design Underground System
     //
     class UndergroundSystem {
