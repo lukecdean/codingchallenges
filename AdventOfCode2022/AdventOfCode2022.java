@@ -523,18 +523,68 @@ class AdventOfCode2022 {
     static void daySixOne() {
         int res = 0;
         String line;
-        while (input.hasNextLine()) {
-            line = input.nextLine();
-        } // while
+        line = input.nextLine();
+
+        int[] counts = new int[26];
+        int uniqueChars = 0;
+        // sliding window
+        for (int i = 0; i < line.length(); i++) {
+            // add to the count of the char at p
+            counts[line.charAt(i) - 'a']++;
+            // if the count goes to 1, increment the # of unique chars
+            if (counts[line.charAt(i) - 'a'] == 1) {
+                uniqueChars++;
+            } // if
+            // subtract from the count of a char 4 behind p
+            if (i > 3) { // counts the initial 4 chars
+                counts[line.charAt(i - 4) - 'a']--;
+                // if the count goes to 0, decrement the # of unique chars
+                if (counts[line.charAt(i - 4) - 'a'] == 0) {
+                    uniqueChars--;
+                } // if
+            } // if
+            if (uniqueChars == 4) {
+                res = i + 1;
+                break;
+            } // if
+        } // for i
+
+
         System.out.println(res);
     } // daySixOne()
 
     static void daySixTwo() {
+        int markerSize = 14;
+        
         int res = 0;
         String line;
-        while (input.hasNextLine()) {
-            line = input.nextLine();
-        } // while
+        line = input.nextLine();
+
+        int[] counts = new int[26];
+        int uniqueChars = 0;
+        // sliding window
+        for (int i = 0; i < line.length(); i++) {
+            // add to the count of the char at p
+            counts[line.charAt(i) - 'a']++;
+            // if the count goes to 1, increment the # of unique chars
+            if (counts[line.charAt(i) - 'a'] == 1) {
+                uniqueChars++;
+            } // if
+            // subtract from the count of a char 4 behind p
+            if (i >= markerSize) { // counts the initial chars
+                counts[line.charAt(i - markerSize) - 'a']--;
+                // if the count goes to 0, decrement the # of unique chars
+                if (counts[line.charAt(i - markerSize) - 'a'] == 0) {
+                    uniqueChars--;
+                } // if
+            } // if
+            if (uniqueChars == markerSize) {
+                res = i + 1;
+                break;
+            } // if
+        } // for i
+
+
         System.out.println(res);
     } // daySixTwo()
 
