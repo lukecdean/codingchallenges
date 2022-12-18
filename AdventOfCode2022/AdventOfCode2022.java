@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 class AdventOfCode2022 {
@@ -57,7 +58,7 @@ class AdventOfCode2022 {
                 daySevenOne();
                 break;
             case ("7-2"):
-                daySevenTwo();
+                daySevenOne();
                 break;
             case ("8-1"):
                 dayEightOne();
@@ -180,7 +181,7 @@ class AdventOfCode2022 {
             return input;
         } catch (Exception e) {
             System.out.println(e);
-            System.exit(1);
+            //System.exit(1);
         } // try
         return null;
     } // getInput()
@@ -589,20 +590,21 @@ class AdventOfCode2022 {
     } // daySixTwo()
 
     static void daySevenOne() {
-        Scanner in;
-        try {
-            in = new Scanner(new File("./input/7-1.txt"));
-        } catch (Exception e) {
-            System.out.println(e);
-            return;
-        } // try
+        Scanner in = input;
         Dir root = new Dir();
         Dir cur = root;
+        in.nextLine();
         while (in.hasNextLine()) {
-            String[] tokens = in.nextLine().split(" ");
-            System.out.println("iter");
+            String line = in.nextLine();
+            String[] tokens = line.split(" ");
+            //System.out.println(line);
             if (tokens.length == 3 && tokens[1].equals("cd")) { // if $ cd
-                cur = cur.getSubdir(tokens[2]);
+                //System.out.println("Going to dir: " + tokens[2]);
+                if (tokens[2].equals("..")) {
+                    cur = cur.parent;
+                } else {
+                    cur = cur.getSubdir(tokens[2]);
+                } // if
             } else if (tokens.length == 2 && tokens[1].equals("ls")) { // if $ ls
                 continue; // ignore
             } else { // not $ cd or $ ls i.e. an ls printout
@@ -618,7 +620,14 @@ class AdventOfCode2022 {
 
         IntegerPointer res = new IntegerPointer();
         root.size(res);
-        System.out.println(res.get());
+        System.out.println("7-1: " + res.get());
+
+        int spaceUsed = root.size;
+        int freeSpace = 70_000_000 - spaceUsed;
+        int needToDelete = 30_000_000 - freeSpace;
+        //System.out.println(needToDelete);
+        int s = root.smallestDirBiggerThan(needToDelete);
+        System.out.println("7-2: " + s);
     } // day7()
 
     static class Dir {
@@ -626,12 +635,14 @@ class AdventOfCode2022 {
         Map<String, Dir> subdirs;
         Map<String, Integer> files;
         int size;
+        boolean isRoot;
 
         Dir(Dir parent) {
             this.parent = parent;
             this.subdirs = new HashMap<>();
             this.files = new HashMap<>();
             this.size = 0;
+            this.isRoot = false;
         } // Dir()
 
         Dir() {
@@ -639,11 +650,12 @@ class AdventOfCode2022 {
             this.subdirs = new HashMap<>();
             this.files = new HashMap<>();
             this.size = 0;
+            this.isRoot = true;
         } // Dir()
 
         void addSubdir(String subdir) {
             if (!subdirs.containsKey(subdir)) {
-                subdirs.put(subdir, new Dir());
+                subdirs.put(subdir, new Dir(this));
             } // if
         } // addSubdir()
 
@@ -651,7 +663,7 @@ class AdventOfCode2022 {
             if (subdirs.containsKey(subdir)) {
                 return subdirs.get(subdir);
             } else {
-                System.out.println("oops");
+                System.out.println("INVALID SUBDIR");
                 return null;
             } // if
         } // getSubdir()
@@ -671,14 +683,33 @@ class AdventOfCode2022 {
 
             for (String key : subdirs.keySet()) {
                 int subdirSize = subdirs.get(key).size(ip);
-                size += subdirSize;
+                this.size += subdirSize;
             } // for key subdirs
 
             if (this.size <= 100_000) {
                 ip.add(this.size);
             } // if
+
             return this.size;
         } // sizeOfDir()
+
+        int smallestDirBiggerThan(int min) {
+            //System.out.println(this.size);
+            int res = Integer.MAX_VALUE;
+            if (this.size >= min) {
+                res = Math.min(res, this.size);
+            } // if
+
+            for (String key : subdirs.keySet()) {
+                int subdirMinSize = subdirs.get(key).smallestDirBiggerThan(min);
+                if (subdirMinSize >= min) {
+                    res = Math.min(res, subdirMinSize);
+                } // if
+            } // for key subdirs
+
+            return res;
+        } // sizeOfDir()
+
     } // class Dir
 
     static class IntegerPointer {
@@ -707,22 +738,148 @@ class AdventOfCode2022 {
     } // daySevenTwo()
 
     static void dayEightOne() {
-        int res = 0;
-        String line;
+        //input = getInput("8-1-eg");
+        String line; // for the scanner
+        // build array of trees
+        List<List<Integer>> trees = new ArrayList<>();
+        int rows = 0;
+        int cols = 0;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            cols = line.length();
+            rows++;
+            trees.add(new ArrayList<Integer>(cols));
+            for (char tree : line.toCharArray()) {
+                trees.get(rows - 1).add((Character.getNumericValue(tree)));
+            } // for tree
         } // while
-        System.out.println(res);
+
+        boolean[][] visible = new boolean[rows][cols];
+
+        int r0 = 0;
+        int r$ = rows - 1;
+        int c0 = 0;
+        int c$ = cols - 1;
+        int r = 0;
+        int c = 0;
+        int temp;
+
+        for (int t = 0; t < 2; t++) { // transposed and not transposed
+            int step = 1;
+            for (int d = 0; d < 2; d++) { // direction
+                //System.out.printf("t: %d, d: %d\n", t, d);
+                // scan the trees from outside in 
+                // any tree taller than the current taller is visible
+                r = r0;
+                while (r <= r$) {
+                    int maxTree = -1;
+                    c = c0;
+                    while (c != c$ + step) {
+                        if (t == 0) { // not transposed
+                            if (trees.get(r).get(c) > maxTree) {
+                                visible[r][c] = true;
+                                maxTree = trees.get(r).get(c);
+                            } // if
+                        } else { // transposed
+                            if (trees.get(c).get(r) > maxTree) {
+                                visible[c][r] = true;
+                                maxTree = trees.get(c).get(r);
+                            } // if
+                        } // if
+                        //System.out.println(r + "" + c);
+                        //System.out.println("c + step: " + (c$ + step));
+                        c += step;
+                        //System.out.println("c: " + c);
+                    } // while c
+                    r++;
+                } // while r
+                // swap the bgn, end and dir for cols
+                temp = c0;
+                c0 = c$;
+                c$ = temp;
+                step = -1;
+            } // for d
+            // 'transpose' the matrix (swap the rows and cols vars)
+            temp = r0;
+            r0 = c0;
+            c0 = temp;
+            temp = r$;
+            r$ = c$;
+            c$ = temp;
+        } // for t
+
+        int res = 0;
+        for (r = 0; r < rows; r++) {
+            for (c = 0; c < cols; c++) {
+                res += visible[r][c] ? 1 : 0;
+                System.out.print(visible[r][c] ? 1 : 0);
+            } // for c
+            System.out.println();
+        } // for r
+
+        System.out.println("res: " + res);
     } // dayEightOne()
 
     static void dayEightTwo() {
-        int res = 0;
+        //input = getInput("8-1-eg");
+        // build array of trees
+        List<List<Integer>> trees = new ArrayList<>();
+        int rows = 0;
+        int cols = 0;
         String line;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            cols = line.length();
+            rows++;
+            trees.add(new ArrayList<Integer>(cols));
+            for (char tree : line.toCharArray()) {
+                trees.get(rows - 1).add((Character.getNumericValue(tree)));
+            } // for tree
         } // while
+
+        int res = 0;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                res = Math.max(res, scenicScore(trees, r, c));
+                //System.out.printf("r: %d, c: %d, score: %d\n", r, c, res);
+            } // for c
+        } // for r
+
         System.out.println(res);
     } // dayEightTwo()
+
+    // find the scenic score of a single tree
+    static int scenicScore(List<List<Integer>> trees, int r, int c) {
+        int score = 1;
+        // get the score from each dir
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int dir = 1; dir < dirs.length && score != 0; dir++) {
+            int ssod = scenicScoreOneDir(trees, r, c, dirs[dir - 1], dirs[dir], -1, trees.get(r).get(c));
+            //System.out.println(ssod);
+            score *= ssod;
+        } // for dir
+        return score;
+    } // scenicScore()
+
+    // find the scenic score of a single direction of a tree
+    static int scenicScoreOneDir(List<List<Integer>> trees, int r, int c, int rdir, int cdir, int minHeight, int ogHeight) {
+        r += rdir;
+        c += cdir;
+        int score = 0;
+        if (r < 0 || trees.size() <= r || c < 0 || trees.get(0).size() <= c) { // out of bounds
+            return 0;
+        } else if (trees.get(r).get(c) >= ogHeight) { // tree is same height as og (max height)
+            return 1; // the last tree it can see
+            /*
+        } else if (trees.get(r).get(c) < minHeight) { // cannot see tree
+            score = 0;
+            */
+        } else { // can see tree
+            score = 1;
+        } // if
+        minHeight = Math.max(minHeight, trees.get(r).get(c));
+        return score + scenicScoreOneDir(trees, r, c, rdir, cdir, minHeight, ogHeight);
+    } // scenicSCoreOneDir()
 
     static void dayNineOne() {
         Scanner input = getInput("./input/9-1.txt");
