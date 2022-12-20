@@ -1020,22 +1020,70 @@ class AdventOfCode2022 {
     } // printRope()
 
     static void dayTenOne() {
+        //input = getInput("10-1-eg");
         int res = 0;
+        int x = 1;
+        int cycle = 1;
         String line;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            String[] tokens = line.split(" ");
+            if (tokens[0].equals("noop")) { // noop intstuction
+                cycle++;
+                res += addInterestingSignal(cycle, x);
+            } else { // addx instruction
+                cycle++;
+                res += addInterestingSignal(cycle, x);
+                x += Integer.parseInt(tokens[1]);
+                cycle++;
+                res += addInterestingSignal(cycle, x);
+            } // if
         } // while
         System.out.println(res);
     } // dayTenOne()
 
+    static int addInterestingSignal(int cycle, int x) {
+            if (cycle == 20 || ((cycle - 20) % 40) == 0) {
+                return x * cycle;
+            } // if
+            return 0;
+    } // addInterestingSignal()
+
+    
     static void dayTenTwo() {
-        int res = 0;
+        //input = getInput("10-1-eg");
+        int x = 1;
+        int cycle = 1;
         String line;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            String[] tokens = line.split(" ");
+            if (tokens[0].equals("noop")) { // noop 
+                render(cycle, x);
+                cycle++;
+            } else { // addx 
+                render(cycle, x);
+                cycle++;
+                render(cycle, x);
+                x += Integer.parseInt(tokens[1]);
+                cycle++;
+            } // if
         } // while
-        System.out.println(res);
+        System.out.println();
     } // dayTenTwo()
+
+    
+    static void render(int cycle, int x) {
+        int pos = (cycle - 1) % 40;
+        if (pos == 0) { // new line
+            System.out.println();
+        } // if
+        if (x - 1 == pos || x == pos || x + 1 == pos) { // sprite on printing pixel
+            System.out.print('#');
+        } else {
+            System.out.print('.');
+        } // if
+    } // render()
 
     static void dayElevenOne() {
         int res = 0;
