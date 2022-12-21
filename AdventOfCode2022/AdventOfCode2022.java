@@ -1,11 +1,14 @@
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Stack;
+import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1086,40 +1089,192 @@ class AdventOfCode2022 {
     } // render()
 
     static void dayElevenOne() {
-        int res = 0;
-        String line;
+        input = getInput("11-1-eg");
+        // create the list of monkeys
+        List<Monkey> monkeys = new ArrayList<>();
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            monkeys.add(new Monkey(input));
         } // while
+        Monkey[] marr = monkeys.toArray(new Monkey[monkeys.size()]);
+        //for (Monkey m : monkeys) System.out.print(m);
+        // simulate the monkeys
+        for (int round = 0; round < 20; round++) {
+            for (Monkey m : monkeys) {
+                m.takeTurn(marr);
+            } // for m
+        } // for round
+        // find 2 most active
+        Collections.sort(monkeys, (Monkey m1, Monkey m2) -> m2.inspections - m1.inspections);
+        int res = 1;
+        res *= monkeys.get(0).inspections;
+        res *= monkeys.get(1).inspections;
         System.out.println(res);
     } // dayElevenOne()
 
     static void dayElevenTwo() {
-        int res = 0;
-        String line;
+        input = getInput("11-1-eg");
+        // create the list of monkeys
+        List<Monkey> monkeys = new ArrayList<>();
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            monkeys.add(new Monkey(input));
         } // while
+        Monkey[] marr = monkeys.toArray(new Monkey[monkeys.size()]);
+        //for (Monkey m : monkeys) System.out.print(m);
+        // simulate the monkeys
+        for (int round = 0; round < 10000; round++) {
+            for (Monkey m : monkeys) {
+                m.takeTurn(marr, true);
+            } // for m
+        } // for round
+        // find 2 most active
+        Collections.sort(monkeys, (Monkey m1, Monkey m2) -> m2.inspections - m1.inspections);
+        long res = 1;
+        res *= monkeys.get(0).inspections;
+        res *= monkeys.get(1).inspections;
         System.out.println(res);
     } // dayElevenTwo()
 
     static void dayTwelveOne() {
-        int res = 0;
+        //input = getInput("12-1-eg");
+        // build the map
+        List<List<Character>> map = new ArrayList<>();
+        int sr = -1;
+        int sc = -1;
+        int er = -1;
+        int ec = -1;
         String line;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            List<Character> row = new ArrayList<>();
+            for (char c : line.toCharArray()) {
+                if (c == 'S') {
+                    //System.out.println("S");
+                    sr = map.size();
+                    sc = row.size();
+                    row.add('a');
+                } else if (c == 'E') {
+                    //System.out.println("E");
+                    er = map.size();
+                    ec = row.size();
+                    row.add('z');
+                } else {
+                    row.add(c);
+                } // if
+            } // for c
+            map.add(row);
         } // while
-        System.out.println(res);
+        // bfs to find the path
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[]{sr, sc});
+        boolean[][] seen = new boolean[map.size()][map.get(0).size()];
+        seen[sr][sc] = true;
+        int res = 0; // steps
+        while (!q.isEmpty()) {
+            res++; // increment steps
+            int qSize = q.size(); // search an entire breadth at the time
+            while (qSize > 0) {
+                if (searchBreadth(map, seen, q, q.poll(), er, ec)) { // found E
+                    System.out.println(res);
+                    return;
+                } // if
+                qSize--;
+            } // while
+        } // while
+        System.out.println("not found");
     } // dayTwelveOne()
 
+    // returns true if the end was found
+    static boolean searchBreadth(List<List<Character>> map, boolean[][] seen, Queue<int[]> q, int[] pos, int er, int ec) {
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int dir = 1; dir < dirs.length; dir++) { // search up, down, left, right
+            int r = pos[0] + dirs[dir - 1];
+            int c = pos[1] + dirs[dir];
+            if (!(0 <= r && r < map.size() && 0 <= c && c < map.get(0).size())) { // if out of bounds
+                continue;
+            } // if
+            if (seen[r][c]) { // if seen
+                continue;
+            } // if
+            if (map.get(r).get(c) - map.get(pos[0]).get(pos[1]) > 1) { // if not reachable
+                continue;
+            } // if
+            if (r == er && c == ec) { // if E
+                return true;
+            } else { // add to q
+                q.offer(new int[]{r, c});
+                seen[r][c] = true;
+            } // if
+        } // for dir
+        return false;
+    } // sB()
+
     static void dayTwelveTwo() {
-        int res = 0;
+        // BFS like 12-1 but bfs from E, searching for 'a'
+        //input = getInput("12-1-eg");
+        // build the map
+        List<List<Character>> map = new ArrayList<>();
+        int er = -1;
+        int ec = -1;
         String line;
         while (input.hasNextLine()) {
             line = input.nextLine();
+            List<Character> row = new ArrayList<>();
+            for (char c : line.toCharArray()) {
+                if (c == 'S') {
+                    //System.out.println("S");
+                    row.add('a');
+                } else if (c == 'E') {
+                    //System.out.println("E");
+                    er = map.size();
+                    ec = row.size();
+                    row.add('z');
+                } else {
+                    row.add(c);
+                } // if
+            } // for c
+            map.add(row);
         } // while
-        System.out.println(res);
+        // bfs to find the path
+        Queue<int[]> q = new LinkedList<>();
+        q.offer(new int[]{er, ec});
+        boolean[][] seen = new boolean[map.size()][map.get(0).size()];
+        seen[er][ec] = true;
+        int res = 0; // steps
+        while (!q.isEmpty()) {
+            res++; // increment steps
+            int qSize = q.size(); // search an entire breadth at the time
+            while (qSize > 0) {
+                if (searchBreadthForA(map, seen, q, q.poll())) { // found a
+                    System.out.println(res);
+                    return;
+                } // if
+                qSize--;
+            } // while
+        } // while
+        System.out.println("not found");
     } // dayTwelveTwo()
+
+    static boolean searchBreadthForA(List<List<Character>> map, boolean[][] seen, Queue<int[]> q, int[] pos) {
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int dir = 1; dir < dirs.length; dir++) { // search up, down, left, right
+            int r = pos[0] + dirs[dir - 1];
+            int c = pos[1] + dirs[dir];
+            if (!(0 <= r && r < map.size() && 0 <= c && c < map.get(0).size())) { // if out of bounds
+                continue;
+            } else if (seen[r][c]) { // if seen
+                continue;
+            } else if (map.get(pos[0]).get(pos[1]) - map.get(r).get(c) > 1) { // if not reachable
+                // current must be reachable from the one being checked. Opposite from 12-1
+                continue;
+            } else if (map.get(r).get(c) == 'a') { // if E
+                return true;
+            } else { // add to q
+                q.offer(new int[]{r, c});
+                seen[r][c] = true;
+            } // if
+        } // for dir
+        return false;
+    } // sBFA()
 
     static void dayThirteenOne() {
         int res = 0;
