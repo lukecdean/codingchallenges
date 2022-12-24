@@ -1277,7 +1277,7 @@ class AdventOfCode2022 {
     } // sBFA()
 
     static void dayThirteenOne() {
-        input = getInput("13-1-eg");
+        //input = getInput("13-1-eg");
         //input = getInput("13-1-1");
         int res = 0;
         int packetPair = 1;
@@ -1291,9 +1291,10 @@ class AdventOfCode2022 {
             System.out.println(l);
             System.out.println(r);
 
-            System.out.println(Packet.inOrder(l, r));
+            int inorder = Packet.inOrder2(l, r);
+            System.out.println(inorder);
 
-            System.out.println();
+            res += inorder == 1 ? packetPair : 0;
 
             if (input.hasNextLine()) {
                 input.nextLine(); // clear blank
@@ -1304,11 +1305,40 @@ class AdventOfCode2022 {
     } // dayThirteenOne()
 
     static void dayThirteenTwo() {
-        int res = 0;
-        String line;
+        //input = getInput("13-1-eg");
+        List<Packet> packets = new ArrayList<>();
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            String lpacket = input.nextLine();
+            String rpacket = input.nextLine();
+
+            Packet l = new Packet(lpacket);
+            Packet r = new Packet(rpacket);
+
+            packets.add(l);
+            packets.add(r);
+
+            if (input.hasNextLine()) {
+                input.nextLine(); // clear blank
+            } // if
         } // while
+        packets.add(new Packet("[[2]]"));
+        packets.add(new Packet("[[6]]"));
+
+        Packet two = (new Packet("[[2]]"));
+        Packet six = (new Packet("[[6]]"));
+
+        Collections.sort(packets);
+
+        int res = 1;
+        int i = 1;
+        for (Packet p : packets) {
+            if (p.equalTo(two) || p.equalTo(six)) {
+                res *= i;
+            } // if
+            System.out.println("#: " + i + " size: " + p.size() + " " + p);
+            i++;
+        } // for p
+
         System.out.println(res);
     } // dayThirteenTwo()
 
