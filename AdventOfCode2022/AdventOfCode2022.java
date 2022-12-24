@@ -1277,10 +1277,28 @@ class AdventOfCode2022 {
     } // sBFA()
 
     static void dayThirteenOne() {
+        input = getInput("13-1-eg");
+        //input = getInput("13-1-1");
         int res = 0;
-        String line;
+        int packetPair = 1;
         while (input.hasNextLine()) {
-            line = input.nextLine();
+            String lpacket = input.nextLine();
+            String rpacket = input.nextLine();
+
+            Packet l = new Packet(lpacket);
+            Packet r = new Packet(rpacket);
+
+            System.out.println(l);
+            System.out.println(r);
+
+            System.out.println(Packet.inOrder(l, r));
+
+            System.out.println();
+
+            if (input.hasNextLine()) {
+                input.nextLine(); // clear blank
+            } // if
+            packetPair++;
         } // while
         System.out.println(res);
     } // dayThirteenOne()
