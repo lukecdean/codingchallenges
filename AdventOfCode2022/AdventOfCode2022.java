@@ -1343,22 +1343,241 @@ class AdventOfCode2022 {
     } // dayThirteenTwo()
 
     static void dayFourteenOne() {
-        int res = 0;
-        String line;
-        while (input.hasNextLine()) {
-            line = input.nextLine();
+        //input = getInput("14-1-eg");
+        // true will be objects, false air
+        boolean[][] cave = new boolean[256][256];
+        // build rocks
+        while (input.hasNextLine()) { // 1 line = 1 rock
+            //System.out.println("input.nextLine");
+            String line = input.nextLine();
+            Scanner rock = new Scanner(line).useDelimiter(" -> |,");
+            //System.out.println(line);
+            int c = rock.nextInt();
+            int r = rock.nextInt();
+            //System.out.println(c);
+            //System.out.println(r);
+            //System.out.println("pre rock next int");
+            //System.out.println("rock has next: " + rock.hasNextInt());
+            while (rock.hasNextInt()) { // a connection
+                //System.out.println("rock next int");
+                int cc = rock.nextInt();
+                int rr = rock.nextInt();
+                System.out.println(cc);
+                System.out.println(rr);
+                // populate the rocks
+                if (c == cc) { // rock along a col
+                    int start = r < rr ? r : rr;
+                    int end = r < rr ? rr : r;
+                    int step = start < end ? 1 : -1;
+                    for (int row = start; row <= end; row += step) {
+                        cave[row][c - 470] = true;
+                    } // for row
+                } else { // rock along a col
+                    int start = c < cc ? c : cc;
+                    int end = c < cc ? cc : c;
+                    int step = start < end ? 1 : -1;
+                    for (int col = start; col <= end; col += step) {
+                        cave[r][col - 470] = true;
+                    } // for col
+                } // if
+                // move rr/cc to r/c for next part of the rock
+                c = cc;
+                r = rr;
+            } // while
+            //System.out.println("finished a line");
         } // while
-        System.out.println(res);
+        //System.out.println("finished input");
+        printCave(cave);
+        int sand = 0;
+        boolean fellIntoAbyss = false;
+        while (!fellIntoAbyss) {
+        //for (int i = 0; i < 3; i++) {
+            //System.out.println("more sand");
+            fellIntoAbyss = fall1(cave, 0, 500 - 470);
+            if (fellIntoAbyss == false) {
+                sand++;
+            } // if
+            //printCave(cave);
+        } // while
+        printCave(cave);
+        System.out.println(sand);
     } // dayFourteenOne()
 
+    private static void printCave(boolean[][] cave) {
+        int height = cave.length;
+        int width = cave[0].length;
+        for (int i = 0; i < 50; i++) {
+            System.out.print(i % 10);
+        } // for i
+        System.out.println();
+        for (int r = 0; r < height; r++) {
+            //for (int c = 0; c < cave[0].length; c++) {
+            System.out.print(r % 10);
+            for (int c = 0; c < width; c++) {
+                System.out.print(cave[r][c] ? '#' : '.');
+            } // for c
+            System.out.println();
+        } // for r 
+    } // printCave()
+    
+    private static boolean fall1(boolean[][] cave, int r, int c) {
+        //System.out.println("falling");
+        // try to fall down
+        if (!inBounds(cave, r + 1, c)) {
+            System.out.println("down");
+            System.out.println("abyss");
+            return true;
+        } else if (!cave[r + 1][c]) {
+            System.out.println("falling down");
+            return fall(cave, r + 1, c);
+        } // if
+        // try to fall down left
+        if (!inBounds(cave, r + 1, c - 1)) {
+            System.out.println("left");
+            System.out.println("abyss");
+            return true;
+        } else if (!cave[r + 1][c - 1]) {
+            System.out.println("falling left");
+            return fall(cave, r + 1, c);
+        } // if
+        // try to fall down right
+        if (!inBounds(cave, r + 1, c + 1)) {
+            System.out.println("right");
+            System.out.println("abyss");
+            return true;
+        } else if (!cave[r + 1][c + 1]) {
+            System.out.println("falling right");
+            return fall(cave, r + 1, c + 1);
+        } // if
+        System.out.println("can't fall");
+        System.out.printf("r: %d, c: %d\n", r, c);
+        cave[r][c] = true;
+        printCave(cave);
+        return false; // couldn't fall but didn't go into the abyss
+    } // fall()
+    
+    private static boolean fall(boolean[][] cave, int r, int c) {
+        if (!inBounds(cave, r + 1, c)) { // falls down into abyss
+            return true;
+        } else if (cave[r + 1][c] == false) { // can fell down
+            return fall(cave, r + 1, c);
+        } else if (!inBounds(cave, r + 1, c - 1)) { // falls left into abyss
+            return true;
+        } else if (cave[r + 1][c - 1] == false) { // can fall left
+            return fall(cave, r + 1, c - 1);
+        } else if (!inBounds(cave, r + 1, c + 1)) { // falls right into abyss
+            return true;
+        } else if (cave[r + 1][c + 1] == false) { // can fall right
+            return fall(cave, r + 1, c + 1);
+        } else { // cannot fall, comes to rest
+            cave[r][c] = true;
+            return false;
+        } // if
+    } // fall()
+
+    private static boolean inBounds(boolean[][] cave, int r, int c) {
+        return !(r < 0 || cave.length <= r || c < 0 || cave[0].length <= c);
+    } // inBounds()
+
     static void dayFourteenTwo() {
-        int res = 0;
-        String line;
-        while (input.hasNextLine()) {
-            line = input.nextLine();
+        //boolean[][] cave = makeRocks("14-1-eg");
+        boolean[][] cave = makeRocks("14-2");
+        
+        printCave(cave);
+
+        // simulate sand
+        int sand = 0;
+        while (cave[0][500] == false) {
+            sand++;
+            fallWithFloor(cave, 0, 500);
         } // while
-        System.out.println(res);
+
+        printCave(cave);
+
+        System.out.println(sand);
     } // dayFourteenTwo()
+
+    static boolean[][] makeRocks(String inputFileName) {
+        // find the max row and col that a rock is at
+        int maxRow = 0;
+        int maxCol = 0;
+        Scanner input = getInput(inputFileName);
+        while (input.hasNextLine()) { // 1 line = 1 rock
+            String line = input.nextLine();
+            Scanner rock = new Scanner(line).useDelimiter(" -> |,");
+            while (rock.hasNextInt()) { // a connection
+                int c = rock.nextInt();
+                int r = rock.nextInt();
+                maxRow = Math.max(r, maxRow);
+                maxCol = Math.max(c, maxCol);
+            } // while rock
+        } // while input
+
+        // now create the cave and the rocks
+        input = getInput(inputFileName); // 'refresh the scanner'
+        int floor = maxRow + 2 + 1;
+        boolean[][] cave = new boolean[floor][1024];
+        while (input.hasNextLine()) { // 1 line = 1 rock
+            String line = input.nextLine();
+            Scanner rock = new Scanner(line).useDelimiter(" -> |,");
+            int c = rock.nextInt();
+            int r = rock.nextInt();
+            while (rock.hasNextInt()) { // a connection
+                //System.out.println("rock part");
+                int cc = rock.nextInt();
+                int rr = rock.nextInt();
+                // populate the rocks
+                if (c == cc) { // rock along a col
+                    int start = r < rr ? r : rr;
+                    int end = r < rr ? rr : r;
+                    int step = start < end ? 1 : -1;
+                    for (int row = start; row <= end; row += step) {
+                        cave[row][c] = true;
+                    } // for row
+                } else { // rock along a col
+                    int start = c < cc ? c : cc;
+                    int end = c < cc ? cc : c;
+                    int step = start < end ? 1 : -1;
+                    for (int col = start; col <= end; col += step) {
+                        cave[r][col] = true;
+                    } // for col
+                } // if
+                // move rr/cc to r/c for next part of the rock
+                c = cc;
+                r = rr;
+            } // while rock
+        } // while input
+
+        // make the floor
+        for (int i = 0; i < cave[0].length; i++) {
+            cave[floor - 1][i] = true;
+        } // for i
+
+        return cave;
+    } // makeRocks()
+
+    // fallWithFloor(): true if sand filled up
+    private static void fallWithFloor(boolean[][] cave, int r, int c) {
+        /*
+        int downRow = r + 1;
+        int downCol = c;
+        int leftRow = r + 1;
+        int leftCol = c - 1;
+        int rightRow = r + 1;
+        int rightCol = c + 1;
+        */
+
+        if (cave[r + 1][c] == false) { // can fall down
+            fall(cave, r + 1, c);
+        } else if (cave[r + 1][c - 1] == false) { // can fall left
+            fall(cave, r + 1, c - 1);
+        } else if (cave[r + 1][c + 1] == false) { // can fall right
+            fall(cave, r + 1, c + 1);
+        } else { // cannot fall, comes to rest
+            cave[r][c] = true;
+        } // if
+    } // fall()
+
 
     static void dayFifteenOne() {
         int res = 0;
