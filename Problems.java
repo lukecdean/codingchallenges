@@ -1241,5 +1241,70 @@ class Problems {
         return ((ip1 == word1.length) && (ip2 == word2.length));
     } // arrayStringsAreEqual()
 
+    //1834 Single-Theaded CPU
+    // 21/12 @ 214 ms
+    public int[] getOrder(int[][] tasks) {
+        // add the tasks to a priority queue based on enque time
+        PriorityQueue<Task> waitingToEnque = new PriorityQueue<>((Task t1, Task t2) -> t1.enqueTime - t2.enqueTime);
+        for (int i = 0; i < tasks.length; i++) {
+            waitingToEnque.offer(new Task(i, tasks[i][0], tasks[i][1]));
+        } // for i
+
+        // create a priority queue based on processing time for tasks ready to process
+        PriorityQueue<Task> waitingToProcess = new PriorityQueue<>((Task t1, Task t2) -> t1.processingTime - t2.processingTime);
+
+        // run the clock to find the tasks ready to process
+        int[] res = new int[tasks.length];
+        int tasksRun = 0;
+        int clock = 1;
+        while (!waitingToEnque.isEmpty() && !waitingToProcess.isEmpty()) {
+            // enque tasks that are ready to be processed
+            while (!waitingtoEnque.isEmpty() && waitingToEnque.peek().enqueTime <= clock) {
+                waitingToProcess.offer(waitingToEnque.poll());
+            } // while
+            
+            // if there are no tasks ready to process, increment clock and continue
+            if (waitingToProcess.isEmpty()) {
+                clock = waitingToEnque.peek().enqueTime;
+                continue;
+            } // if
+
+            // will 'fast forward' the clock to end of the current tasks' processing time so 
+            // may always find the next process to run at this point in execution
+            // if there are multiple tasks with the same processing time, run the one with the smallest index
+            PriorityQueue<Task> run = new PriorityQueue<>((Task t1, Task t2) -> t1.index - t2.index);
+            run.offer(waitingToProcess.poll());
+            while (!waitingToProcess.isEmpty() && run.peek().processingTime == waitingToProcess.peek().processingTime) {
+                run.offer(waitingToProcess.poll());
+            } // while
+
+            System.out.println("running");
+            // new process the next task
+            Task nextTask = run.poll();
+            clock += nextTask.processingTime; // 'fast forward' clock
+            res[tasksRun] = nextTask.index; // add to res
+            tasksRun++;
+
+            // return the unrun tasks to waitingToProcess
+            while (!run.isEmpty()) {
+                waitingToProcess.offer(run.poll());
+            } // while
+        } // while clock
+
+        return res;
+    } // getOrder()
+
+    class Task {
+        int index;
+        int enqueTime;
+        int processingTime;
+
+        Task(int index, int enqueTime, int processingTime) {
+            this.index = index;
+            this.enqueTime = enqueTime;
+            this.processingTime = processingTime;
+        } // Task()
+    } // Task
+
 
 } // Problems
