@@ -3066,6 +3066,56 @@ public class Grind75 {
         return sum - gauss;
     } // findDuplicate()
 
+    // 300 Longest Increasing Subsequence
+    // n^2 sol
+    public int lengthOfLIS(int[] nums) {
+        // edge case
+        if (nums.length <= 1) {
+            return nums.length;
+        } // if
+
+        int[] res = new int[nums.length];
+        res[0] = nums[0];
+        int resLen = 1;
+        // keep the current list of the subsequence in res
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] > res[resLen - 1]) { // a greater num for the subsequence found
+                // add it to the res
+                res[resLen] = nums[i];
+                resLen++;
+            } else if (nums[i] == res[resLen - 1]) {
+                // move on
+            } else { // a num less than end of res
+                // binary search for where it would go in res
+                int potentialPos = binarySearch(res, resLen, nums[i]);
+                int curLen = resLen - potentialPos + 1;
+                // if a (sub)subsequence can be found that is longer, use it
+                int potentialLen = 1;
+                int[] potentialSubseq = new int[curLen];
+                potentialSubseq[0] = nums[i];
+                while (potentialLen < curLen) {
+
+                } // while
+            } // if
+        } // for i
+    } // lengthOfLIS()
+
+    private int binarySearch(int[] res, int resLen, int num) {
+        int b = 0;
+        int e = resLen;
+        while (b < e) {
+            int m = (b + e) / 2; // middle
+            if (res[m] < num) { // num is right of midpoint
+                b = m + 1;
+            } else if (res[m] == num) { // found num
+                return m;
+            } else { // num is left of midpoint
+                n = m - 1;
+            } // if
+        } // while
+        return b + 1;
+    } // binarySearch()
+
     // 310. Minimum Height Trees
     //
     public List<Integer> findMinHeightTrees(int n, int[][] edges) {
@@ -3710,7 +3760,7 @@ public class Grind75 {
 
     // 692. Top K Frequent Words
     //
-    public List<String> topKFrequent(String[] words, int k) {
+    public List<String> topKFrequent1(String[] words, int k) {
         Map<String, Integer> wordCounts = new HashMap<>();
         for (String word : words) {
             wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
@@ -3740,6 +3790,30 @@ public class Grind75 {
         return res;
     } // topKFrequent()
 
+    public List<String> topKFrequent(String[] words, int k) {
+        // count the frequency of each word
+        Map<String, Integer> freqMap = new HashMap<>();
+        for (String word : words) {
+            freqMap.add(word, freqMap.getOrDefault(word, 0) + 1);
+        } // for word
+
+        // create the WordFrequency objects and place them into a priority queue
+        PriorityQueue<WordFrequency> pq = new PriorityQueue<>();
+        for (String word : freqMap.keySet()) {
+            WordFrequency wf = new WordFrequency(word, freqMap.get(word));
+            pq.offer(wf);
+        } // for word
+
+        // return a list with the top k elements from the pq
+        List<String> res = new ArrayList<>(k);
+        while (k > 0) {
+            res.add(pq.poll().word);
+            k--;
+        } // while
+        return res;
+    } // topKFrequent()
+
+    // 100/79 @ 5ms
     class WordFrequency implements Comparable<WordFrequency> {
         String word;
         int frequency;
@@ -3750,7 +3824,21 @@ public class Grind75 {
         } // WordFreqeucy()
 
         public int compareTo(WordFrequency wf) {
-            return this.frequency - wf.frequency;
+            int sort = wf.frequency - this.frequency;
+            if (sort != 0) { // if not same frequency
+                return sort;
+            } // else return based on lexicographical order
+            // compare char by char
+            for (int c = 0; c < this.word.length() && c < wf.word.length(); c++) {
+                int c1 = this.word.charAt(c);
+                int c2 = wf.word.charAt(c);
+                if (c1 != c2) {
+                    return c1 - c2;
+                } // if
+            } // for c
+            // loop breaks when a word ends before the other and they are == up to that point
+            // so return based on the shorter one
+            return this.word.length() - wf.word.length();
         } // compareTo()
     } // class WordFrequency
 
