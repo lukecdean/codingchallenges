@@ -3067,6 +3067,39 @@ public class Grind75 {
     } // findDuplicate()
 
     // 300 Longest Increasing Subsequence
+    //
+    public int lengthOfLIS(int[] nums) {
+        int[] tails = new int[nums.length];
+        int size = 0;
+        for (int n : nums) {
+            int b = 0;
+            int e = size;
+            int m;
+            while (b != e) {
+                m = (b + e) / 2;
+                if (tails[m] < n) {
+                    b = m + 1;
+                } else {
+                    e = m;
+                } // if
+            } // while
+            tails[b] = n;
+            if (b == size) {
+                size++;
+            } // if
+            printArr(tails);
+        } // for n
+        return size;
+    } // lengthOfLIS()
+    public void printArr(int[] arr) {
+        String s = "[";
+        for (int n : arr) {
+            s += n + ",";
+        } // for n
+        s += "]";
+        System.out.println(s);
+    } // printArr()
+
     // n^2 sol
     public int lengthOfLIS(int[] nums) {
         // edge case
