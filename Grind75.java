@@ -3384,6 +3384,147 @@ public class Grind75 {
     } // backtrack()
 
     // 417. Pacific Atlantic Water Flow
+    // 98/68 @ 4ms
+    class Solution {
+
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        int rows = heights.length;
+        int cols = heights[0].length;
+        boolean[][] p = new boolean[rows][cols];
+        boolean[][] a = new boolean[rows][cols];
+        for (int r = 0; r < rows; r++) {
+            dfs(r, 0, rows, cols, heights[r][0], p, heights);
+            //p[r][0] = 1;
+            dfs(r, cols - 1, rows, cols, heights[r][cols - 1], a, heights);
+            //a[r][cols - 1] = 1;
+        } // for r
+        for (int c = 0; c < cols; c++) {
+            dfs(0, c, rows, cols, heights[0][c], p, heights);
+            //p[0][c] = 1;
+            dfs(rows - 1, c, rows, cols, heights[rows - 1][c], a, heights);
+            //a[rows - 1][c] = 1;
+        } // for c
+
+        List<List<Integer>> res = new LinkedList<>();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (p[r][c] && a[r][c]) {
+                    List<Integer> space = new ArrayList<>(2);
+                    space.add(r);
+                    space.add(c);
+                    res.add(space);
+                } // if
+            } // for c
+        } // for r
+        return res;
+    } // pA()
+
+    private void dfs(int r, int c, int rows, int cols, int prevHeight, boolean[][] visited, int[][] heights) {
+        if (r < 0 || r >= rows || c < 0 || c >= cols || prevHeight > heights[r][c] || visited[r][c]) {
+            return;
+        } // if
+        visited[r][c] = true;
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int dir = 1; dir < dirs.length; dir++) {
+            dfs(r + dirs[dir], c + dirs[dir - 1], rows, cols, heights[r][c], visited, heights);
+        } // for dir
+    } // dfs()
+
+    } // class
+
+    // 11/39 @ 169ms
+    class Solution {
+
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        int rows = heights.length;
+        int cols = heights[0].length;
+        // 0 unchecked; 1 reaches; -1 does not reach; 2 being checked
+        int[][] p = new int[rows][cols];
+        int[][] a = new int[rows][cols];
+        // base cases, all edges reach an ocean
+        for (int r = 0; r < rows; r++) {
+            p[r][0] = 1;
+            a[r][cols - 1] = 1;
+        } // for r
+        for (int c = 0; c < cols; c++) {
+            p[0][c] = 1;
+            a[rows - 1][c] = 1;
+        } // for c
+        // check each space for reachability
+        for (int r = 0; r < heights.length; r++) {
+            for (int c = 0; c < heights[0].length; c++) {
+                dfs(r, c, p, heights);
+                dfs(r, c, a, heights);
+            } // for c
+        } // for r
+        // now check for spaces which reach p and a and add those that do to the list
+        List<List<Integer>> res = new LinkedList<>();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (p[r][c] == 1 && a[r][c] == 1) {
+                    List<Integer> space = new ArrayList<>(2);
+                    space.add(r);
+                    space.add(c);
+                    res.add(space);
+                    /*
+                    System.out.print('o'); // debug
+                } else if (p[r][c] == 1) {
+                    System.out.print('p'); // debug
+                } else if (a[r][c] == 1) {
+                    System.out.print('a'); // debug
+                } else {
+                    System.out.print('x'); // debug
+                    */
+                } // if
+            } // for c
+            //System.out.println(); // debug
+        } // for r
+        return res;
+    } // pacificAtlantic()
+    // see if o[r][c] reachs the ocean
+    public boolean dfs(int r, int c, int[][] o, int[][] heights) {
+        if (outOfBounds(r, c, heights)) {
+            return false;
+        } else if (o[r][c] == 1) { // already found to reach
+            return true;
+        } else if (o[r][c] == -1) { // already found to not reach
+            return false;
+        } else if (o[r][c] == 2) { // already in dfs
+            return false;
+        } // if
+        o[r][c] = 2;
+        // dfs for a spot that already reaches
+        int[] dirs = new int[]{0, -1, 0, 1, 0};
+        for (int dir = 1; dir < dirs.length; dir++) {
+            int rr = r + dirs[dir];
+            int cc = c + dirs[dir - 1];
+            if (canFlow(r, c, rr, cc, heights)) {
+                if (dfs(rr, cc, o, heights)) {
+                    o[r][c] = 1;
+                    return true;
+                } // if
+            } // if
+        } // for dir
+        // if the dfs did not find a path
+        //o[r][c] = -1;
+        o[r][c] = 0;
+        return false;
+    } // dfs()
+    public boolean outOfBounds(int r, int c, int[][] heights) {
+        int rows = heights.length;
+        int cols = heights[0].length;
+        return (r < 0 || r >= rows || c < 0 || c >= cols);
+    } // inBounds()
+    // from x to xx
+    public boolean canFlow(int r, int c, int rr, int cc, int[][] heights) {
+        if (outOfBounds(r, c, heights) || outOfBounds(rr, cc, heights)) {
+            return false;
+        } // if
+        return (heights[r][c] >= heights[rr][cc]);
+    } // canFlow()
+
+    } // class Solution
+
     //
     class Solution {
     public List<List<Integer>> pacificAtlantic(int[][] heights) {
