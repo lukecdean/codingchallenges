@@ -2581,6 +2581,53 @@ public class Grind75 {
         } // find()
     } // class Trie
 
+    // 210. Course Schedule II
+    // 41/65 @ 8ms
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        // create list with lists of prereqs
+        List<List<Integer>> prs = new ArrayList<>(numCourses);
+        for (int i = 0; i < numCourses; i++) {
+            prs.add(new ArrayList<Integer>());
+        } // for i
+        for (int[] pr : prerequisites) {
+            prs.get(pr[0]).add(pr[1]);
+        } // for pr
+        List<Integer> schedule = new LinkedList<>();
+        boolean[] inDfsBranch = new boolean[numCourses];
+        boolean[] inSchedule = new boolean[numCourses];
+        for (int c = 0; c < numCourses; c++) {
+            // add the courses to the list where it ends; each course is pushed out when a prereq of it is added
+            if (dfs(prs, c, inDfsBranch, schedule, 0, inSchedule) == false) {
+                return new int[]{}; // cycle found: no schedule
+            } // if
+        } // for
+        int[] res = new int[numCourses];
+        for (int i = 0; i < numCourses; i++) {
+            res[i] = schedule.get(numCourses - i - 1);
+        } // for c
+        return res;
+    } // findOrder()
+    // returns false if there is a cycle (no valid ordering)
+    private boolean dfs(List<List<Integer>> prs, int course, boolean[] inDfsBranch, List<Integer> schedule, int placeInSchedule, boolean[] inSchedule) {
+        if (inDfsBranch[course] == true) {
+            return false; // cycle found!
+        } else if (inSchedule[course] == true) {
+            return true; // already accounted for in schedule
+        } else {
+            inDfsBranch[course] = true;
+            inSchedule[course] = true;
+            schedule.add(placeInSchedule, course);
+        } // if
+        // dfs each prereq as well
+        for (int pr : prs.get(course)) {
+            if (dfs(prs, pr, inDfsBranch, schedule, placeInSchedule + 1, inSchedule) == false) {
+                return false;
+            } // if
+        } // for pr
+        inDfsBranch[course] = false;
+        return true;
+    } // dfs()
+
     // 211. Design Add and Search Words Data Structure
     // search() - O(26^3 * wordLength)/O()
     // 74/58 @ 841ms
@@ -3067,7 +3114,7 @@ public class Grind75 {
     } // findDuplicate()
 
     // 300 Longest Increasing Subsequence
-    //
+    // 97/93 @ 3ms
     public int lengthOfLIS(int[] nums) {
         int[] tails = new int[nums.length];
         int size = 0;
@@ -3417,7 +3464,7 @@ public class Grind75 {
             } // for c
         } // for r
         return res;
-    } // pA()
+    } // pacificAtlantic()
 
     private void dfs(int r, int c, int rows, int cols, int prevHeight, boolean[][] visited, int[][] heights) {
         if (r < 0 || r >= rows || c < 0 || c >= cols || prevHeight > heights[r][c] || visited[r][c]) {
