@@ -1596,6 +1596,37 @@ public class Grind75 {
         else return 1 + (r > l ? r : l);
     } // depth()
 
+    // 113. Path Sum II
+    // 100/52 @ 1ms
+    public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
+        List<List<Integer>> res = new ArrayList<>();
+
+        dfs(root, targetSum, 0, new ArrayList<Integer>(), res);
+        return res;
+    } // pathSum()
+    private void dfs(TreeNode root, int targetSum, int currSum,
+                     List<Integer> currVals, List<List<Integer>> res) {
+        if (root == null) {
+            return;
+        } // if
+        // else still on a branch
+        currSum += root.val; // add val to sum
+        currVals.add(root.val); // add node to path list
+        if (root.left == null && root.right == null) { // leaf found
+            if (currSum == targetSum) { // if target val is found
+                // add the current path to the res
+                //res.add(currVals.subList(0, currVals.size()));
+                res.add(new ArrayList<>(currVals));
+            } // if
+        } else { // still inside a branch
+            // dfs left and right
+            dfs(root.left, targetSum, currSum, currVals, res);
+            dfs(root.right, targetSum, currSum, currVals, res);
+        } // if
+        // remove the curr val and return
+        currVals.remove(currVals.size() - 1);
+    } // dfs()
+
     // 121. Best Time to Buy and Sell Stock
     // 69/55 @ 3 ms; 94/69 @ 2 ms
     public int maxProfit(int[] prices) {
