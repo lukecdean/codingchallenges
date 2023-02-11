@@ -495,6 +495,26 @@ public class Grind75 {
         return res.next;
     } // mergeTwoLists()
 
+    // 24. Swap Nodes in Pairs
+    // 100/98 @ 0ms
+    public ListNode swapPairs(ListNode head) {
+        ListNode dummy = new ListNode(-1, head);
+        head = dummy;
+        ListNode prev;
+        ListNode curr;
+        ListNode next;
+        while (head.next != null && head.next.next != null) {
+            prev = head;
+            curr = head.next;
+            next = head.next.next;
+            curr.next = next.next;
+            next.next = curr;
+            prev.next = next;
+            head = curr;
+        } // while
+        return dummy.next;
+    } // swapPairs()
+
     // 33. Search in Rotated Sorted Array
     // 76/56 @ 1ms;
     // O(logn)/ : do a binary search to find a region without a rotation
