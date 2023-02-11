@@ -1699,6 +1699,41 @@ public class Grind75 {
         return -1;
     } // nextAlphaNumChar()
 
+    // 128. Longest Consecutive Sequence
+    // 68/34 @ 26ms
+    public int longestConsecutive(int[] nums) {
+        Map<Integer, Boolean> map = new HashMap<>();
+        // Map each num to true
+        for (int n : nums) {
+            map.put(n, true);
+        } // for n
+        int max = 0;
+        // iterate through nums a second time
+        for (int n : nums) {
+            if (map.get(n) == false) { // skip already counted
+                continue;
+            } // if
+            // count how many consecutive nums are mapped left then right
+            int count = 1;
+            // map the counted nums to false
+            map.put(n, false);
+            int left = n - 1;
+            while (map.containsKey(left)) {
+                count++;
+                map.put(left, false);
+                left--;
+            } // while left
+            int right = n + 1;
+            while (map.containsKey(right)) {
+                count++;
+                map.put(right, false);
+                right++;
+            } // while right
+            max = Math.max(max, count);
+        } // for n
+        return max;
+    } // longestConsecutive()
+
     // 133. Clone Graph
     // O(n)/O(n) 100/98 @ 25ms
     public Node cloneGraph(Node node) {
