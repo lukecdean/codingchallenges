@@ -2310,6 +2310,30 @@ public class Grind75 {
         return maj;
     } // majortyElement()
 
+    // 189. Rotate Array
+    // 64/54 @ 1ms
+    public void rotate(int[] nums, int k) {
+        if (nums.length <= 1) {
+            return;
+        } // if
+        k = k % nums.length; // k is effectively between 0 and nums.length
+        int[] temp = new int[k];
+        // place the first k elements in a temp array
+        for (int i = 0; i < k; i++) {
+            temp[i] = nums[i];
+        } // for i
+        // move the elements, starting from the end, to their new positions
+        int end = nums.length - 1;
+        for (int i = 0; i < nums.length; i++) {
+            // use % to wrap around the array
+            nums[(end - i + k) % nums.length] = nums[end - i];
+        } // for i
+        // now place the temp nums in their places
+        for (int i = 0; i < k; i++) {
+            nums[(k + i) % nums.length] = temp[i];
+        } // for i
+    } // rotate()
+
     // 198. House Robber
     // 100/ @ 0ms
     // iteravely
@@ -2368,6 +2392,9 @@ public class Grind75 {
     } // rob()
 
     // 199. Binary Tree Right Side View
+    // len = 6
+    // k =   1 2 3 4 5 6
+    // its = 1 2 3 2 1 0
     // O(n)/O(n)
     // 95/90 @ 1ms; 49/15 @ 2ms 
     public List<Integer> rightSideView(TreeNode root) {
