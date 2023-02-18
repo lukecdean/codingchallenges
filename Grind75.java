@@ -3440,6 +3440,40 @@ public class Grind75 {
         return -1;
     } // coinChange()
 
+    // 328. Odd Even Linked List
+    // 100/76 @ 0ms
+    public ListNode oddEvenList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        } // if
+        
+        ListNode oe = head;         // odd end
+        ListNode eb = oe.next;    // even beg
+        ListNode ee = eb;           // even end
+
+        oe.next = null;
+        ListNode curr = ee.next;
+        ee.next = null;
+
+        boolean currOdd = true;
+        while (curr != null) {
+            // 'disconnect' curr from list
+            ListNode temp = curr.next;
+            curr.next = null;
+            if (currOdd) {  // on odd
+                oe.next = curr; // add odd curr to odd list
+                oe = oe.next;
+            } else {    // on even
+                ee.next = curr; // add even curr to even list
+                ee = ee.next;
+            } // if
+            curr = temp; // update curr
+            currOdd = !currOdd;
+        } // while
+        oe.next = eb; // combine lists
+        return head;
+    } // oddEvenList()
+
     // 338. Counting Bits
     // 88/ @ 2ms
     public int[] countBits(int n) {
