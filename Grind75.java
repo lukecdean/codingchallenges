@@ -3499,6 +3499,47 @@ public class Grind75 {
         return true;
     } // canConstruct()
 
+    // 394. Decode String
+    // 100/55 @ 0ms
+    public String decodeString(String s) {
+        StringBuilder sb = new StringBuilder();
+        decode(s, sb, 0, 1);
+        return sb.toString();
+    } // decodeString()
+
+    // returns the pos after the recurse to skip to in parent
+    private int decode(String s, StringBuilder sb, int pos, int k)  {
+        int maxC = pos;
+        while (k > 0) { // decode the inner string k times
+            for (int c = pos; c < s.length(); c++) {
+                if (Character.isDigit(s.charAt(c))) { // if there is a k
+                    int nextK = Character.getNumericValue(s.charAt(c));
+                    c++;
+                    // terrible code: k may be up to 3 digits
+                    if (Character.isDigit(s.charAt(c))) {
+                        nextK *= 10;
+                        nextK += Character.getNumericValue(s.charAt(c));
+                        c++;
+                    } // if
+                    if (Character.isDigit(s.charAt(c))) {
+                        nextK *= 10;
+                        nextK += Character.getNumericValue(s.charAt(c));
+                        c++;
+                    } // if
+                    c++; // skip '['
+                    c = decode(s, sb, c, nextK);
+                } else if (s.charAt(c) == ']') { // end of this inner string
+                    maxC = c; // to know where the calling decode() is to go to
+                    break;
+                } else {
+                    sb.append(s.charAt(c)); // just a letter to append
+                } // if
+            } // for c
+            k--;
+        } // while k
+        return maxC;
+    } // recurse()
+
     // 409. Longest Palindrome
     // 75/85 @ 3ms; 93/ @ 2ms;
     public int longestPalindrome(String s) {
