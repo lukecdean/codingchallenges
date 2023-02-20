@@ -3981,6 +3981,59 @@ public class Grind75 {
     private boolean isAnagram(String s, String p, int i, Map<Character, Integer> letters) {
     } // isAnagram()
 
+    // 525. Contiguous Array
+    public int findMaxLength(int[] nums) {
+        if (nums == null|| nums.length == 1 || nums.length == 0) {
+            return 0;
+        } // if
+        // count the total 0s and 1s
+        int ones = 0;
+        int zeros = 0;
+        for (int n : nums) {
+            if (n == 0) {
+                zeros++;
+            } else {
+                ones++;
+            } // if
+        } // for n
+        // the contiguous array may be only twice the min number of 1s or 0s
+        int maxLenOfSubArray = (Math.min(ones, zeros)) * 2;
+        // sliding window alg
+        int b = 0;
+        int e = 0;
+        int res = 0;
+        int currLen = 1; // window's curr len
+        // the difference in ones and zeros in the window
+        int diff = nums[0] == 0 ? -1 : 1;
+        while (b < nums.length && e < nums.length) {
+            if (b == e) {
+                // lengthen
+                e++;
+                currLen++;
+                diff += nums[e] == 0 ? -1 : 1;
+            // if e is at the end of nums,
+            // or currLen is max,
+            // or curr beg cannot gain enough to make diff 0
+            } else if ((e == nums.length - 1)
+                    || (currLen == maxLenOfSubArray)
+                    || (currLen + Math.abs(diff) > maxLenOfSubArray)) {
+                // shorten
+                diff -= nums[b] == 0 ? -1 : 1;
+                b++;
+                currLen--;
+            } else {
+                // lengthen
+                e++;
+                currLen++;
+                diff += nums[e] == 0 ? -1 : 1;
+            } // if
+            if (diff == 0) {
+                res = Math.max(res, currLen);
+            } // if
+        } // while
+        return res;
+    } // findMaxLength()
+
     // 543. Diameter of a Binary Tree
     // 65/7 @ 1ms;
     public int diameterOfBinaryTree(TreeNode root) {
