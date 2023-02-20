@@ -3982,6 +3982,93 @@ public class Grind75 {
     } // isAnagram()
 
     // 525. Contiguous Array
+    // 3.0 discussion solution
+    public int findMaxLength(int[] nums)  {
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == 0) {
+                nums[i] = -1;
+            } // if
+        } // for i
+        Map<Integer, Integer> sumToIndex = new HashMap<>();
+        sumToIndex.put(0, -1);
+        int sum = 0;
+        int i = -1;
+        int maxLen = 0;
+        while (i < nums.length - 1) {
+            i++;
+            sum += nums[i];
+            if (sumToIndex.containsKey(sum)) {
+                maxLen = Math.max(maxLen, i - sumToIndex.get(sum));
+            } else {
+                sumToIndex.put(sum, i);
+            } // if
+        } // while
+        return maxLen;
+    } // findMaxLength()
+
+    // 2.0
+    public int findMaxLength(int[] nums) {
+        if (nums == null|| nums.length == 0 || nums.length == 1) {
+            return 0;
+        } // if
+        // count the total 0s and 1s
+        int ones = 0;
+        int zeros = 0;
+        for (int n : nums) {
+            if (n == 0) {
+                zeros++;
+            } else {
+                ones++;
+            } // if
+        } // for n
+        int beg = 0;
+        int end = 0;
+        int curLen = 1;
+        int dif = 0; // the dif in zeros and ones
+        if (nums[0] == 0) {
+            dif += -1;
+            zeros--;
+        } else { // == 1
+            dif += 1;
+            ones--;
+        } // if
+        // as the window moves down, ones and zeros keeps track of
+        // how many of those digits remain beyond the window
+        int maxLen = 0;
+        while (beg < nums.length - 1 && end < nums.length) {
+            if (    (end == nums.length - 1)
+                    || ((beg != end)
+                        && (   (dif < 0 && Math.abs(dif) > ones)
+                            || (dif > 0 && Math.abs(dif) > zeros)))) {
+                // end is at the end of nums
+                // OR beg != end AND
+                //      not enough 1s beyond to bring dif to 0
+                //      OR not enough 0s beyond to bring dif to 0
+                // shorten
+                dif -= nums[beg] == 0 ? -1 : 1;
+                beg++;
+                curLen--;
+            } else {
+                // there are enough zeros or ones beyond the window
+                // lengthen
+                end++;
+                curLen++;
+                if (nums[end] == 0) {
+                    dif += -1;
+                    zeros--;
+                } else { // == 1
+                    dif += 1;
+                    ones--;
+                } // if
+            } // if
+            if (dif == 0) { // same number of zeros and ones
+                maxLen = Math.max(maxLen, curLen);
+            } // if
+        } // while
+        return maxLen;
+    } // findMaxLength()
+
+    // 1.0
     public int findMaxLength(int[] nums) {
         if (nums == null|| nums.length == 1 || nums.length == 0) {
             return 0;
