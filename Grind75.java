@@ -4358,6 +4358,43 @@ public class Grind75 {
         } // if
     } // findEnd()
 
+    // 2.0
+    // 48/54 @ 2ms
+    public int widthOfBinaryTree(TreeNode root)  {
+        List<Long> lBranches = new ArrayList<>();
+        List<Long> rBranches = new ArrayList<>();
+        traverse(root, 0, 0, lBranches, rBranches);
+        int maxWidth = 0;
+        for (int i = 0; i < lBranches.size() && i < rBranches.size(); i++) {
+            int currWidth = (int) (rBranches.get(i) - lBranches.get(i) + 1);
+            maxWidth = Math.max(maxWidth, currWidth);
+        } // for i
+        return maxWidth;
+    } // widthOfBinaryTree()
+
+    private void traverse(TreeNode root, int level, long branch,
+            List<Long> lBranches, List<Long> rBranches) {
+        if (root == null) {
+            return;
+        } // if
+
+        // check most left at level
+        if (lBranches.size() == level) {
+            lBranches.add(branch);
+        } else if (lBranches.get(level) > branch) {
+            lBranches.set(level, branch);
+        } // if
+        // check most right at level
+        if (rBranches.size() == level) {
+            rBranches.add(branch);
+        } else if (rBranches.get(level) < branch) {
+            rBranches.set(level, branch);
+        } // if
+
+        traverse(root.left, level + 1, branch * 2, lBranches, rBranches);
+        traverse(root.right, level + 1, branch * 2 + 1, lBranches, rBranches);
+    } // traverse()
+
     // 1.0 - linear space
     // 5/6 @ 82ms
     public int widthOfBinaryTree(TreeNode root) {
