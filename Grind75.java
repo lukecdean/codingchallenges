@@ -1276,6 +1276,64 @@ public class Grind75 {
         } // while
     } // sortColors()
 
+    // 76. Minimum Window Substring
+    // 88/15 @ 5ms 
+    public String minWindow(String s, String t) {
+        // count chars in t
+        int[] tChars = new int['z' - 'A' + 1];
+        int tCharCounts = 0; // how many unique chars are in t
+        for (char c : t.toCharArray()) {
+            tChars[c - 'A']++;
+            if (tChars[c - 'A'] == 1) {
+                tCharCounts++;
+            } // if
+        } // for c
+        // sliding window over s adjusting counts of letters
+        // when tCharCounts is 0, all letters will be in the window
+        // putting a letter in the window, subtract one from tChars[letter]
+        // when a tChars[] goes to 0, the window contains all of that letter
+        // at that point decrement tCharCounts
+        int b = 0;
+        int e = -1;
+        int minB = b;
+        int minE = s.length();
+        while (b < s.length() && e < s.length()) {
+            if (e < s.length() - 1 && tCharCounts > 0) {
+                // window does not contain all of the t chars
+                e++;
+                tChars[s.charAt(e) - 'A']--;
+                if (tChars[s.charAt(e) - 'A'] == 0) {
+                    // all of this letter from t are in the window
+                    tCharCounts--;
+                } // if
+            } else { // tCharCounts == 0
+                // all of t's letters are in s, so shrink the window
+                // to see if it can be smaller
+                tChars[s.charAt(b) - 'A']++;
+                if (tChars[s.charAt(b) - 'A'] == 1) {
+                    // this letter is no longer in the window
+                    tCharCounts++;
+                } // if
+                b++;
+            } // if
+
+            if (tCharCounts == 0) {
+                // all of t's letters are in the window so check if min
+                if ((e - b) < (minE - minB)) {
+                    // is a smaller window
+                    minB = b;
+                    minE = e;
+                } // if
+            } // if
+        } // while
+
+        if (minE != s.length()) { 
+            return s.substring(minB, minE + 1);
+        } else { // minE never updated ie no soln found
+            return "";
+        } // if
+    } // minWindow()
+
     // 78. Subsets
     // O(n!)/O(n!)
     // 41/69 @ 2ms
