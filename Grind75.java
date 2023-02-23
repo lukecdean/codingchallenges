@@ -4307,6 +4307,123 @@ public class Grind75 {
         } // compareTo()
     } // class Task
 
+    // 662. Maximum Width of Binary Tree
+    //
+    public int widthOfBinaryTree(TreeNode root) {
+        int level = 0;
+        Stack<TreeNode> left = new Stack<>();
+        int leftBranch = 0;
+        Stack<TreeNode> right = new Stack<>();
+        int rightBranch = 0;
+        int maxWidth = 0;
+        while (left.top().left != null
+                || left.top().right != null
+                || right.top().left != null
+                || right.top().right != null) {
+            leftBranch = findLeftmostOnLevel(level);
+            rightBranch = findRightmostOnLevel(level);
+        } // while
+    } // widthOfBinaryTree()
+
+    private findEnd(boolean right, Stack<TreeNode> stack,
+                    int currBranch, int currLevel) {
+        int newBranch = currBranch;
+        int newLevel = currLevel;
+        if ((right ? stack.top().right : stack.top().left) != null) {
+            // go outward if possible
+            stack.push(right ? stack.top().right : stack.top().left);
+            newBranch *= 2;
+            newBranch += (right ? 1 : 0);
+            newLevel++;
+        } else if ((right ? stack.top().left : stack.top().right) != null) {
+            // go inward if possible
+            stack.push(right ? stack.top().left : stack.top().right);
+            newBranch *= 2;
+            newBranch += (right ? 0 : 1);
+            newLevel++;
+        } else {
+            // go back up and traverse
+            boolean poppedRight = newBranch & 1 == 1;
+            stack.pop();
+            newBranch /= 2;
+            newLevel--;
+            // if the right child was popped,
+            while (poppedRight == (right ? true : false)) {
+                poppedRight = newBranch & 1 == 1;
+                stack.pop();
+                newBranch /= 2;
+                newLevel--;
+            } // while
+
+        } // if
+    } // findEnd()
+
+    // 1.0 - linear space
+    // 5/6 @ 82ms
+    public int widthOfBinaryTree(TreeNode root) {
+        if (root == null) {
+            return 0;
+        } // if
+        List<Integer> left = new ArrayList<>();
+        List<Integer> right = new ArrayList<>();
+        left.add(0);
+        right.add(0);
+        goLeft(root, left, 0, 0);
+        goRight(root, right, 0, 0);
+        
+        int maxWidth = 1
+        for (int level = 0;
+                level < Math.min(left.size(), right,size()); level++) {
+            int levelWidth = right.get(level) - left.get(level) + 1;
+            maxWidth = Math.max(maxWidth, levelWidth);
+        } // for level
+        return maxWidth;
+    } // widthOfBinaryTree()
+
+    private void goLeft(TreeNode root, List<Integer> list,
+            int level, int branch) {
+        if (root.left != null) {
+            int nextLevel = level + 1;
+            int nextBranch = branch * 2;
+            // the first node encountered on this level is the left most of
+            // the level
+            if (nextLevel == list.size()) {
+                list.set(nextLevel, nextBranch);
+            } // if
+            goLeft(root.left, list, newLevel, newBranch);
+        } // if
+        if (root.right != null) {
+            int nextLevel = level + 1;
+            int nextBranch = branch * 2 + 1;
+            if (nextLevel == list.size()) {
+                list.set(nextLevel, nextBranch);
+            } // if
+            goLeft(root.right, list, newLevel, newBranch);
+        } // if
+    } // goLeft()
+
+    private void goRight(TreeNode root, List<Integer> list,
+            int level, int branch) {
+        if (root.right != null) {
+            int nextLevel = level + 1;
+            int nextBranch = branch * 2 + 1;
+            // the first node encountered on this level is the right most of
+            // the level
+            if (nextLevel == list.size()) {
+                list.set(nextLevel, nextBranch);
+            } // if
+            goRight(root.right, list, newLevel, newBranch);
+        } // if
+        if (root.left != null) {
+            int nextLevel = level + 1;
+            int nextBranch = branch * 2;
+            if (nextLevel == list.size()) {
+                list.set(nextLevel, nextBranch);
+            } // if
+            goRight(root.left, list, newLevel, newBranch);
+        } // if
+    } // goRight()
+
     // 692. Top K Frequent Words
     //
     public List<String> topKFrequent1(String[] words, int k) {
