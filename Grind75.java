@@ -653,6 +653,57 @@ public class Grind75 {
         } // for
     } // combinationSum()
 
+    // 42. Trapping Rain Water
+    // 98/21 @ 1 ms
+    public int trap(int[] height) {
+        if (height.length < 2) {
+            return 0;
+        } // if
+
+        int volume = 0;
+
+        int currHighestPos = 0;
+        int currHighestHeight = height[0];
+        int currMaxVolume = 0;
+        for (int wall = 1; wall < height.length; wall++) {
+            // look for the next wall which is >= height
+            if (height[wall] >= currHighestHeight) {
+                volume += currMaxVolume;
+                currHighestPos = wall;
+                currHighestHeight = height[wall];
+                currMaxVolume = 0;
+            // else it's lower so add its volume
+            } else {
+                currMaxVolume += currHighestHeight - height[wall];
+            } // if
+        } // for i
+        // after this loop, the currHighestPos will be on the 
+        // right most highest wall in the arr
+        // so run the same alg backwards to get the
+        // right side's volume
+        int tallestWallPos = currHighestPos;
+        int tallestWallHeight = currHighestHeight;
+        currHighestPos = height.length - 1;
+        currHighestHeight = height[currHighestPos];
+        currMaxVolume = 0;
+        for (int wall = currHighestPos - 1;
+                wall >= tallestWallPos;
+                wall--)
+        {
+            // look for the next wall which is >= height
+            if (height[wall] >= currHighestHeight) {
+                volume += currMaxVolume;
+                currHighestPos = wall;
+                currHighestHeight = height[wall];
+                currMaxVolume = 0;
+            // else it's lower so add its volume
+            } else {
+                currMaxVolume += currHighestHeight - height[wall];
+            } // if
+        } // for wall leftward
+        return volume;
+    } // trap()
+
     // 46. Permutations
     // O(n!)/O(n!)
     // 13/25 @ 5ms on the tail end of the time normal curve/on the right curve of the bimodal distribution
@@ -3283,6 +3334,164 @@ public class Grind75 {
         int gauss = (n * (n + 1)) / 2;
         return sum - gauss;
     } // findDuplicate()
+
+    // 297. Serialize and Deserialize a Binary Tree
+    //
+    public class Codec {
+
+        // Encodes a tree to a single string.
+        public String serialize(TreeNode root) {
+            // preorder traversal, comma separated, 'x' where no child
+            StringBuilder sb = new StringBuilder();
+            traverse(root, sb);
+            return sb.toString();
+        }
+
+        // traverse the tree preorder, add vals
+        private void traverse(TreeNode root, StringBuilder sb) {
+            addVal(root, sb);
+            if (root == null) {
+                return;
+            } // if
+            traverse(root.left, sb);
+            traverse(root.right, sb);
+        } // traverse()
+
+        // Add an 'x' or the val of the node to an sb
+        private void addVal(TreeNode root, StringBuilder sb) {
+            sb.append((root == null ? 'x' : root.val));
+            sb.append(',');
+        } // addVal()
+
+        // Decodes your encoded data to tree.
+        public TreeNode deserialize(String data) {
+            return makeTree(data, 0);
+        }
+
+        private TreeNode makeTree(String data, int place) {
+            TreeNode node = new TreeNode();
+            place = extractVal(data, place, node);
+            if (place == -1) { // reached the end of data
+                return node;
+            } // if 
+            node.left = makeTree(data, place);
+            if (node.left.val == null) {
+                node.left = null;
+            } // if
+            node.right = makeTree(data, place);
+            if (node.right.val == null) {
+                node.right = null;
+            } // if
+            return node;
+        }
+
+        // fill in next node 
+        // returns the index of the next val in data
+        private int extractVal(String data, int place, TreeNode node) {
+            if (place >= data.length()) {
+                return -1;
+            } else if (data.charAt(place) == 'x') {
+                // if no child, leave null
+                return place + 2;
+            } // if
+
+            int sign = 1;
+            if (data.charAt(place) == '-') {
+                sign = -1;
+                place++;
+            } // if
+
+            int val = 0;
+            // while (c < data.length() && data.charAt(place) != ',') { // safe
+            // faster, works if data is well formed
+            while (data.charAt(place) != ',') {
+                val *= 10;
+                val += Character.getNumericValue(data.charAt(place));
+                place++;
+            } // while
+
+            node.val = val;
+
+            return place;
+        } // extractVal()
+    } // class codec
+
+    // v0, poor planning here...
+    public class Codec {
+
+        // Encodes a tree to a single string.
+        public String serialize(TreeNode root) {
+            StringBuilder sb = new StringBuilder();
+            recSerialize(root, sb);
+            return sb.toString();
+        } // serialize()
+
+        public void recSerialize(TreeNode root, StringBuilder sb) {
+            if (root == null) {
+                sb.append('x');
+                return;
+            } // if
+            sb.append(root.val);
+            recSerialize(root.left, sb);
+            recSerialize(root.right, sb);
+        } // serialize()
+
+        // Decodes your encoded data to tree.
+        public TreeNode deserialize(String data) {
+            if (data.length() == 0 || data.charAt(0) == 'x') {
+                return null;
+            } // if
+            int c = 0;
+            int sign = 1;
+            if (data.charAt(c) == '-') {
+                sign = -1;
+                c++;
+            } // if
+            TreeNode root = new TreeNode(
+                    sign * Character.getNumericValue(data.charAt(c))
+                    );
+            c++;
+            recDeserialize(root, data, c);
+            return root;
+        } // deserialize()
+
+        public int recDeserialize(TreeNode parent, String data, int c) {
+            if (data.length() <= c) {
+                return c;
+            } // if
+            if (data.charAt(c) == 'x') { // left child null
+                c++;
+            } else {
+                int sign = 1;
+                if (data.charAt(c) == '-') {
+                    sign = -1;
+                    c++;
+                } // if
+                TreeNode left = new TreeNode(
+                        sign * Character.getNumericValue(data.charAt(c))
+                        );
+                c++;
+                parent.left = left;
+                c = recDeserialize(left, data, c);
+            } // if
+            if (data.charAt(c) == 'x') { // right child null
+                c++;
+            } else {
+                int sign = 1;
+                if (data.charAt(c) == '-') {
+                    sign = -1;
+                    c++;
+                } // if
+                TreeNode right = new TreeNode(
+                        sign * Character.getNumericValue(data.charAt(c))
+                        );
+                c++;
+                parent.right = right;
+                c = recDeserialize(right, data, c);
+            } // if
+            return c;
+        } // deserialize()
+    }
 
     // 300 Longest Increasing Subsequence
     // 97/93 @ 3ms
