@@ -3336,24 +3336,24 @@ public class Grind75 {
     } // findDuplicate()
 
     // 295. Find Median From Data Stream
-
+    // 75/51 @ 122ms
 class MedianFinder {
     PriorityQueue<Integer> lower;
     PriorityQueue<Integer> upper;
 
     public MedianFinder() {
         this.lower = new PriorityQueue<Integer>(
-                (Integer a, Integer b) -> a - b
+                (Integer a, Integer b) -> b - a
                 ); // max queue
         this.upper = new PriorityQueue<Integer>(
-                (Integer a, Integer b) -> b - a
+                (Integer a, Integer b) -> a - b
                 ); // min queue
     }
     
     public void addNum(int num) {
         if (lower.size() + upper.size() == 0) {
             lower.offer(num);
-        } else if (num <= this.findMedian()) {
+        } else if (num <= lower.peek()) {
             lower.offer(num);
         } else { // num > median
             upper.offer(num);
