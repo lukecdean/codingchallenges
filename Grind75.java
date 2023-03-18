@@ -3335,6 +3335,117 @@ public class Grind75 {
         return sum - gauss;
     } // findDuplicate()
 
+    // 295. Find Median From Data Stream
+
+class MedianFinder {
+    PriorityQueue<Integer> lower;
+    PriorityQueue<Integer> upper;
+
+    public MedianFinder() {
+        this.lower = new PriorityQueue<Integer>(
+                (Integer a, Integer b) -> a - b
+                ); // max queue
+        this.upper = new PriorityQueue<Integer>(
+                (Integer a, Integer b) -> b - a
+                ); // min queue
+    }
+    
+    public void addNum(int num) {
+        if (lower.size() + upper.size() == 0) {
+            lower.offer(num);
+        } else if (num <= this.findMedian()) {
+            lower.offer(num);
+        } else { // num > median
+            upper.offer(num);
+        } // if
+       // if lower has more than 1 more nums, move num over to upper
+       if (lower.size() - upper.size() > 1) {
+           upper.offer(lower.poll());
+       } else if (upper.size() > lower.size()) {
+           lower.offer(upper.poll());
+       } // if
+       System.out.printf("lower: %d, size: %d\n", lower.peek(),lower.size());
+       System.out.printf("upper: %d, size: %d\n", upper.peek(),upper.size());
+    }
+    
+    public double findMedian() {
+        if (lower.size() + upper.size() == 0) {
+            return lower.peek();
+        } else if (lower.size() == upper.size()) {
+            return ((double) (lower.peek() + upper.peek())) / 2.0;
+        } else {
+            return lower.peek();
+        } // if
+    }
+}
+    // TLE - uses linear insertion
+class MedianFinder {
+    int[] nums;
+    int size;
+
+    public MedianFinder() {
+        nums = new int[8];
+        size = 0;
+    }
+    
+    public void addNum(int num) {
+        if (size >= nums.length) {
+            expandNums();
+        } // if
+        // binary search to find place
+        int place = getPlace(num);
+        placeNum(num, place);
+        size++;
+    }
+
+    private int getPlace(int num) {
+        int b = 0;
+        int e = size;
+        int m;
+        while (b < e) {
+            m = e / 2;
+            if (num < nums[m]) {
+                e = m;
+            } else if (num > nums[m]) {
+                b = m + 1;
+            } else { // num == nums[m]
+                return m;
+            } // if
+        } // while
+        return e;
+    } // bS()
+
+    private void placeNum(int num, int place) {
+        // shift up each num to make room for the new num
+        for (int i = this.size; i > place; i--) {
+            nums[i] = nums[i - 1];
+        } // for i
+        nums[place] = num;
+    } // placeNum()
+
+    private void expandNums() {
+        int newSize = size << 1;
+        int[] newNums = new int[newSize];
+        for (int i = 0; i < size; i++) {
+            newNums[i] = nums[i];
+        } // for i
+        this.size = newSize;
+        this.nums = newNums;
+    } // expandNums()
+    
+    public double findMedian() {
+        if (size == 0) {
+            return 0;
+        } // if
+        int middle = size / 2;
+        if ((size & 1) == 1) { // odd
+            return nums[middle];
+        } else { // even
+            return ((double)nums[middle] + (double)nums[middle - 1]) / 2.0;
+        } // if
+    }
+}
+
     // 297. Serialize and Deserialize a Binary Tree
     //
     public class Codec {
