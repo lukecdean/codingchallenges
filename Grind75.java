@@ -1808,6 +1808,68 @@ public class Grind75 {
         return -1;
     } // nextAlphaNumChar()
 
+    // 127. Word Ladder
+    // 5/91 @ 2100ms
+    public int ladderLength(
+            String beginWord, String endWord, List<String> wordList)
+    {
+        // make a graph: words - vertices; single-difference - edge;
+        Map<String, List<String>> wordGraph = new HashMap<>();
+        for (String word : wordList) {
+            wordGraph.set(word, findAdjacent(word));
+        } // for word
+        if (!wordGraph.containsKey(beginWord)) {
+            wordGraph.put(beginWord, findAdjacent(beginWord));
+        } // if
+
+        // bfs from beginWord to endWord
+        Queue<String> q = new LinkedList<>();
+        Set<String> seen = new HashSet<>();
+        int distance = 1;
+        q.offer(beginWord);
+        seen.add(beginWord);
+        while (!q.isEmpty()) {
+            int adjacents = q.size();
+            while (adjacents > 0) { // one depth at a time
+                for (String adjacent : wordGraph.get(q.poll())) {
+                    if (endWord.equals(adjacent)) {
+                        return distance + 1;
+                    } // if
+                    if (!seen.contains(adjacent)) {
+                        q.offer(adjacent);
+                        seen.add(adjacent);
+                    } // if
+                } // for
+                adjacents--;
+            } // while
+            distance++;
+        } // while
+        return 0;
+    } // ladderLength()
+    private static List<String> findAdjacent(
+            String word, List<String> wordList)
+    {
+        List<String> adjacents = new ArrayList<>();
+        for (String otherWord : wordList) {
+            if (oneLetterDifference(word, otherWord)) {
+                adjacents.add(otherWord);
+            } // if
+        } // for
+        return adjacents;
+    } // findAdjacent()
+    private static boolean oneLetterDifference(String a, String b) {
+        if (a.length() != b.length()) {
+            return false;
+        } // if
+        int diffs = 0;
+        for (int letter = 0; letter < a.length(); letter++) {
+            if (a.charAt(letter) != b.charAt(letter)) {
+                diffs++;
+            } // if
+        } // for letter
+        return diffs == 1;
+    } // oneLetterDifference()
+
     // 128. Longest Consecutive Sequence
     // 68/34 @ 26ms
     public int longestConsecutive(int[] nums) {

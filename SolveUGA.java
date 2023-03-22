@@ -483,5 +483,191 @@ class SolveUGA {
         return res;
     } // longestPalindrome()
 
+    // 3-20-23
+    // 1206. Design Skiplist
+class Skiplist {
+    SLNode head;
+    int size;
+    int layers;
+    double coinFlipOdds = .5;
+
+    public Skiplist() {
+        SLNode head;
+        size = 0;
+        layers = 0;
+    }
+    
+    public boolean search(int target) {
+        if (head == null) {
+            return false;
+        } // if
+        SLNode curr = head;
+        if (target < curr.val) {
+            // if the head is greater than target
+            return false;
+        } // if
+        while (curr != null) {
+            if (curr.next == null || target < curr.next.val) {
+                curr = curr.down;
+            } else if (target > curr.next.val) {
+                curr = curr.next;
+            } else { // target == curr.next.val
+                return true;
+            } // if
+        } // while
+        return false;
+    }
+    
+    public void add(int num) {
+        size++;
+        if (size == 1)  {
+            head = new SLNode(num, null, null);
+            layers = 1;
+            return;
+        } // if
+        if (needToAddLayer()) {
+            addLayer();
+        } // if
+        if (num < head.val) { // need to make new head
+            addNewHead(num, head);
+            return;
+        } // if
+        // now recursively find the place where the num is to be placed
+        addHelper(num, head);
+    } // add()
+    
+    private boolean needToAddLayer() {
+        return (layers < (Math.log(size) / Math.log(1.0 / coinFlipOdds)));
+    } // needToAddLayer()
+
+    private void addLayer() {
+        SLNode newHead = new SLNode(head.val, null, head);
+        this.head = newHead;
+    } // addLayer()
+
+    // recursively finds the bottom of the list then adds a new head
+    // coin flips to determine where to prune old head
+    private SLNode addNewHead(int num, SLNode curr) {
+        if (curr.down != null) {
+            SLNode below = addNewHead(curr.down);
+            SLNode newHead = new SLNode(num, curr, below);
+            if (below.next != null) { // if the old head hasn't been pruned yet
+                boolean pruneOldHead = Math.random() > coinFlipOdds;
+                // if true, start removing old heads
+                if (pruneOldHead) {
+                    newHead.next = curr.next; // 'cuts' out old head
+                } // if
+            } else { // old heads have started to be pruned already so cont
+                newHead.next = curr.next; // 'cuts' out old head
+            } // if
+
+            return newHead;
+        } else { // found bottom
+            SLNode newHead = new SLNode(num, curr, null);
+            return newHead;
+        } // if
+    } // addNewHead()
+
+    // returns the node below if a coin flip is to be made else null
+    private SLNode addHelper(int num, SLNode curr) {
+        // go as far next in the list as the num should go
+        while (curr.next != null && curr.next.val < num) {
+            curr = curr.next;
+        } // while
+        if (curr.down == null) { // base case, now place num nodes
+            SLNode numNode = new SLNode(num, curr.next, null);
+            curr.next = numNode;
+            return numNode;
+        } else { // may traverse down a layer
+            SLNode belowNode = addHelper(num, curr.down);
+            // on return, see if a node is to be added
+            if (belowNode == null) { // do not coin flip
+                return null;
+            } else { // do coin flip
+                if (Math.random() <= coinFlipOdds) {
+                    SLNode numNode = new SLNode(num, curr.next, belowNode);
+                    curr.next = numNode;
+                    return numNode;
+                } else {
+                    return null;
+                } // if
+            } // if
+        } // if
+        return null;
+    } // addHelper()
+    
+    public boolean erase(int num) {
+        if (size == 0) {
+            return false;
+        } // if
+
+        if (head.val == num) {
+            eraseHead();
+            size--;
+        } else if (eraseHelper(num, head)) {
+            size--;
+        } // if
+
+        return true;
+    } // erase()
+
+    private void eraseHead() {
+        if (size == 1) {
+            head = null;
+            return;
+        } // if
+        // else remove head and make next val the new head
+        eraseHeadHelper(head);
+        head = head.next;
+    } // eraseHead()
+
+    // builds up the next element to the top layer
+    // does not delete the current head
+    private SLNode eraseHeadHelper(SLNode curr) {
+        if (curr.down != null) { // not at the bottom
+            SLNode downNext = eraseHeadHelper(curr.down);
+            if (downNext != null) {
+                // check if need to insert next head to build it up to the top
+                if (curr.next == null || curr.next.val != downNext.val) {
+                    SLNode newHeadInLayer = 
+                        new SLNode(downNext.val, curr.next, downNext);
+                    return newHeadInLayer;
+                } else {
+                    return curr.next;
+                } // if
+            } // if
+            return null;
+        } else { // at the bottom
+            return curr.next;
+        } // if
+    } // eHH()
+
+    //
+    private void eraseHelper(int num, SLNode curr) {
+        if (curr == null) { // did not find the target num
+            return false;
+        } // if
+        while (curr.next != null && (num < curr.next.val)) {
+            curr = curr.next;
+        } // while
+        if (curr.next == null) { // reached end of this list, so go down
+            return eraseHelper(num, curr.down);
+        } else if (curr.next.val == num) { // found num to remove
+            curr.next = curr.next.next; // 'cut' out the num
+            return true;
+        } // if
+    } // eraseHelper()
+} // class Skiplist
+
+class SLNode {
+    int val;
+    SLNode next;
+    SLNode down;
+
+    public SLNode(int val, SLNode next, SLNode down) {
+        this.val = val;
+    } // SLNode()
+} // SLNode
+
 
 } // class
