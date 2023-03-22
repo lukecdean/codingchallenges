@@ -549,7 +549,7 @@ class Skiplist {
     // coin flips to determine where to prune old head
     private SLNode addNewHead(int num, SLNode curr) {
         if (curr.down != null) {
-            SLNode below = addNewHead(curr.down);
+            SLNode below = addNewHead(num, curr.down);
             SLNode newHead = new SLNode(num, curr, below);
             if (below.next != null) { // if the old head hasn't been pruned yet
                 boolean pruneOldHead = Math.random() > coinFlipOdds;
@@ -593,7 +593,6 @@ class Skiplist {
                 } // if
             } // if
         } // if
-        return null;
     } // addHelper()
     
     public boolean erase(int num) {
@@ -643,16 +642,17 @@ class Skiplist {
     } // eHH()
 
     //
-    private void eraseHelper(int num, SLNode curr) {
+    private boolean eraseHelper(int num, SLNode curr) {
         if (curr == null) { // did not find the target num
             return false;
         } // if
         while (curr.next != null && (num < curr.next.val)) {
             curr = curr.next;
         } // while
-        if (curr.next == null) { // reached end of this list, so go down
+        if (curr.next == null || curr.next.val != num) { 
+            // reached end of this list or place where num should be so go down
             return eraseHelper(num, curr.down);
-        } else if (curr.next.val == num) { // found num to remove
+        } else (curr.next.val == num) { // found num to remove
             curr.next = curr.next.next; // 'cut' out the num
             return true;
         } // if
