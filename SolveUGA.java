@@ -507,12 +507,12 @@ class Skiplist {
             return false;
         } // if
         while (curr != null) {
-            if (curr.next == null || target < curr.next.val) {
-                curr = curr.down;
-            } else if (target > curr.next.val) {
-                curr = curr.next;
-            } else { // target == curr.next.val
+            if (curr.val == target) {
                 return true;
+            } else if (curr.next != null && curr.next.val <= target ) {
+                curr = curr.next;
+            } else { // curr.next == null || curr.next.val > target
+                curr = curr.down;
             } // if
         } // while
         return false;
@@ -534,6 +534,7 @@ class Skiplist {
         } // if
         // now recursively find the place where the num is to be placed
         addHelper(num, head);
+        printsl(); // debug
     } // add()
     
     private boolean needToAddLayer() {
@@ -603,11 +604,13 @@ class Skiplist {
         if (head.val == num) {
             eraseHead();
             size--;
+            return true;
         } else if (eraseHelper(num, head)) {
             size--;
+            return true;
+        } else { // erase did not find
+            return false;
         } // if
-
-        return true;
     } // erase()
 
     private void eraseHead() {
@@ -652,11 +655,25 @@ class Skiplist {
         if (curr.next == null || curr.next.val != num) { 
             // reached end of this list or place where num should be so go down
             return eraseHelper(num, curr.down);
-        } else (curr.next.val == num) { // found num to remove
+        } else { // found num to remove
             curr.next = curr.next.next; // 'cut' out the num
             return true;
         } // if
     } // eraseHelper()
+
+    private void printsl() {
+        System.out.println("size: " + size);
+        SLNode curr = head;
+        while (curr != null) {
+            SLNode currcurr = curr;
+            while (currcurr != null) {
+                System.out.print(currcurr.val  + " ");
+                currcurr = currcurr.next;
+            } // while
+            curr = curr.down;
+            System.out.println();
+        } // while
+    } // printsl()
 } // class Skiplist
 
 class SLNode {
@@ -666,6 +683,8 @@ class SLNode {
 
     public SLNode(int val, SLNode next, SLNode down) {
         this.val = val;
+        this.next = next;
+        this.down = down;
     } // SLNode()
 } // SLNode
 
