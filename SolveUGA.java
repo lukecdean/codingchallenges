@@ -523,18 +523,22 @@ class Skiplist {
         if (size == 1)  {
             head = new SLNode(num, null, null);
             layers = 1;
+            //printsl(); // debug
             return;
         } // if
         if (needToAddLayer()) {
             addLayer();
         } // if
         if (num < head.val) { // need to make new head
-            addNewHead(num, head);
-            return;
+                              // replace current head column with new head
+                              // and add old head instead of num
+            int newHead = num;
+            num = head.val;
+            replaceHead(newHead);
         } // if
         // now recursively find the place where the num is to be placed
         addHelper(num, head);
-        printsl(); // debug
+        //printsl(); // debug
     } // add()
     
     private boolean needToAddLayer() {
@@ -546,33 +550,19 @@ class Skiplist {
         this.head = newHead;
     } // addLayer()
 
-    // recursively finds the bottom of the list then adds a new head
-    // coin flips to determine where to prune old head
-    private SLNode addNewHead(int num, SLNode curr) {
-        if (curr.down != null) {
-            SLNode below = addNewHead(num, curr.down);
-            SLNode newHead = new SLNode(num, curr, below);
-            if (below.next != null) { // if the old head hasn't been pruned yet
-                boolean pruneOldHead = Math.random() > coinFlipOdds;
-                // if true, start removing old heads
-                if (pruneOldHead) {
-                    newHead.next = curr.next; // 'cuts' out old head
-                } // if
-            } else { // old heads have started to be pruned already so cont
-                newHead.next = curr.next; // 'cuts' out old head
-            } // if
-
-            return newHead;
-        } else { // found bottom
-            SLNode newHead = new SLNode(num, curr, null);
-            return newHead;
-        } // if
-    } // addNewHead()
+    // replaces the head with a new value
+    private void replaceHead(int num) {
+        SLNode curr = head;
+        while (curr != null) {
+            curr.val = num;
+            curr = curr.down;
+        } // while
+    } // replaceHead()
 
     // returns the node below if a coin flip is to be made else null
     private SLNode addHelper(int num, SLNode curr) {
         // go as far next in the list as the num should go
-        while (curr.next != null && curr.next.val < num) {
+        while (curr.next != null && curr.next.val <= num) {
             curr = curr.next;
         } // while
         if (curr.down == null) { // base case, now place num nodes
@@ -601,26 +591,30 @@ class Skiplist {
             return false;
         } // if
 
+        boolean res = false;
         if (head.val == num) {
             eraseHead();
             size--;
-            return true;
+            res = true;
         } else if (eraseHelper(num, head)) {
             size--;
-            return true;
+            res = true;
         } else { // erase did not find
-            return false;
+            res = false;
         } // if
+        //printsl(); // debug
+        return res;
     } // erase()
 
     private void eraseHead() {
         if (size == 1) {
             head = null;
+            //size = 0;
             return;
         } // if
         // else remove head and make next val the new head
-        eraseHeadHelper(head);
-        head = head.next;
+        SLNode newHead = eraseHeadHelper(head);
+        head = newHead;
     } // eraseHead()
 
     // builds up the next element to the top layer
@@ -649,20 +643,23 @@ class Skiplist {
         if (curr == null) { // did not find the target num
             return false;
         } // if
-        while (curr.next != null && (num < curr.next.val)) {
+        while (curr.next != null && (num > curr.next.val)) {
             curr = curr.next;
         } // while
+        // curr.next will now be >= num
         if (curr.next == null || curr.next.val != num) { 
             // reached end of this list or place where num should be so go down
+            // ie num is not in this layer
             return eraseHelper(num, curr.down);
         } else { // found num to remove
             curr.next = curr.next.next; // 'cut' out the num
+            eraseHelper(num, curr.down);
             return true;
         } // if
     } // eraseHelper()
 
     private void printsl() {
-        System.out.println("size: " + size);
+        System.out.println("size: " + size + "=========");
         SLNode curr = head;
         while (curr != null) {
             SLNode currcurr = curr;
@@ -673,6 +670,7 @@ class Skiplist {
             curr = curr.down;
             System.out.println();
         } // while
+        System.out.println("==================");
     } // printsl()
 } // class Skiplist
 
