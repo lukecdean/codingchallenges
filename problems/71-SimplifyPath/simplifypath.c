@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+// 36/72 @ 6ms
 char * simplifyPath(char * path){
     int pathLen = strlen(path);
     char *res = (char *) malloc(pathLen + 1);
