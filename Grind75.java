@@ -2992,6 +2992,60 @@ public class Grind75 {
         return false;
     } // containsDuplicate()
 
+    // 224, Basic Calculator
+    // 91/59 @ 6ms
+    public int calculate(String s) {
+       return calculate(s, 0)[0]; 
+    }
+    // returns the value of this expression and the following place: on ')' or $
+    // the parent call should return a place of s.length() + 1
+    private int[] calculate(String s, int place) {
+        // {value of expression, end index of expression}
+        int[] retVals = {0,place};
+        boolean plus = true; // first digit in the expression will be added
+        while (retVals[1] < s.length()) {
+            char c = s.charAt(retVals[1]);
+            if (c == '(') {
+                // if start of an expression
+                int[] subExpression = calculate(s, retVals[1] + 1);
+                retVals[0] += plus ? subExpression[0] : subExpression[0] * -1;
+                // reset sign since the previous one has now been applied
+                plus = true; 
+                retVals[1] = subExpression[1] + 1;
+            } else if (Character.isDigit(c)) {
+                // a number
+                int currentNumber = 0;
+                // parse the number
+                while (retVals[1] < s.length()
+                        && Character.isDigit(s.charAt(retVals[1])))
+                {
+                    c = s.charAt(retVals[1]);
+                    currentNumber *= 10;
+                    currentNumber += Character.getNumericValue(c);
+                    retVals[1]++;
+                } // while
+                // place will be the first char after the digit
+                retVals[0] += plus ? currentNumber : currentNumber * -1;
+                plus = true;
+            } else if (c == '+') {
+                // a plus sign
+                plus = true;
+                retVals[1]++;
+            } else if (c == '-') {
+                // a minus sign
+                plus = false;
+                retVals[1]++;
+            } else if (c == ')') {
+                // end of an expression
+                break;
+            } else { // is whitespace
+                // a space, no meaning
+                retVals[1]++;
+            } // if
+        } // while
+        return retVals;
+    } // calculate()
+
     // 226. Invert Binary Tree
     // 100/60 @ 0 ms
     public TreeNode invertTree(TreeNode root) {
