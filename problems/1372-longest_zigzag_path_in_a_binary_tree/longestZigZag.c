@@ -10,7 +10,7 @@
  * };
  */
 
-// 77/46 @ 116 ms
+// 85/46 @ 113 ms
 int longestZigZag(struct TreeNode* root){
     return dfs(root, -1, 0);
 }
@@ -22,27 +22,15 @@ int dfs(struct TreeNode* root, int dir, int zigzaglen) {
         return zigzaglen - 1;
     } // if
 
-    int zzleft = 0;
-    int zzright = 0;
-
     // go left
     // if same dir as from parent, reset len
-    zzleft = dfs(root->left, 0, 
+    int zzleft = dfs(root->left, 0, 
             dir == LEFT ? 1 : (zigzaglen + 1));
 
     // go right
     // if same dir as from parent, reset len
-    zzright = dfs(root->right, 1,
+    int zzright = dfs(root->right, 1,
             dir == RIGHT ? 1 : (zigzaglen + 1));
 
-    // find longest zigzag
-    int longestzigzag = zigzaglen;
-    if (zzleft > longestzigzag) {
-        longestzigzag = zzleft;
-    } // if
-    if (zzright > longestzigzag) {
-        longestzigzag = zzright;
-    } // if
-
-    return longestzigzag;
+    return zzleft > zzright ? zzleft : zzright;
 } // dfs()
