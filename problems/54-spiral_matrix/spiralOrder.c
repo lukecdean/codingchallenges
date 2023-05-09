@@ -1,48 +1,77 @@
+// 100/61 @ 0ms
 int* spiralOrder (int** matrix, int matrixSize, int* matrixColSize, int* returnSize) {
-    int *res = malloc(matrixSize * *matrixColSize);
+    int *res = malloc(sizeof(int) * matrixSize * *matrixColSize);
     int resindex = 0;
 
     int rows = matrixSize;
-    int cols = matrixColSize;
+    int cols = *matrixColSize;
     int row = 0;
-    int col = 0;
+    int col = -1;
 
-    int padding = 0;
+    int l = 0;
+    int r = cols - 1;
+    int u = 0;
+    int d = rows - 1;
 
     int iters = rows < cols ? rows : cols;
     iters += iters & 1; // if odd
 
-    while (padding < iters) {
-        while (col < cols - padding) {
-            printf("right"); //debug
+    while (iters) {
+        col++;
+        if (!(l <= col && col <= r && u <= row && row <= d)) {
+            break;
+        } // if
+        while (col <= r) {
+            //printf("right, r: %d, c: %d\n", row, col); //debug
             res[resindex] = matrix[row][col];
             resindex++;
             col++;
         } // while
         col--;
-        while (row < rows - padding) {
-            printf("down"); //debug
+        u++;
+
+        row++;
+        if (!(l <= col && col <= r && u <= row && row <= d)) {
+            break;
+        } // if
+        while (row <= d) {
+            //printf("down, r: %d, c: %d\n", row, col); //debug
             res[resindex] = matrix[row][col];
             resindex++;
             row++;
         } // while
         row--;
-        while (col >= padding) {
-            printf("left"); //debug
+        r--;
+
+        col--;
+        if (!(l <= col && col <= r && u <= row && row <= d)) {
+            break;
+        } // if
+        while (col >= l) {
+            //printf("left, r: %d, c: %d\n", row, col); //debug
             res[resindex] = matrix[row][col];
             resindex++;
             col--;
         } // while
         col++;
-        while (row >= padding + 1) {
-            printf("up"); //debug
+        d--;
+
+        row--;
+        if (!(l <= col && col <= r && u <= row && row <= d)) {
+            break;
+        } // if
+        while (row >= u) {
+            //printf("up, r: %d, c: %d\n", row, col); //debug
             res[resindex] = matrix[row][col];
             resindex++;
             row--;
         } // while
         row++;
-        padding++;
+        l++;
+
+        iters--;
     } // while
 
+    *returnSize = resindex;
     return res;
 } // spiralOrder()
