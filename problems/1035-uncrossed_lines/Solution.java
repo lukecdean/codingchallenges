@@ -8,6 +8,8 @@ class Solution {
             } // for c
         } // for r
 
+        
+
         // the locations of integers in the b array
         Map<Integer, List<Integer>> numlocs = new HashMap<>;
         for (int j = 0; j < b.length; j++) {
