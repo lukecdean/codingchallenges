@@ -1,17 +1,27 @@
 class Solution {
-    public double new21Game(int n, int k, int maxPts) {
-        if (n == k - 1 + maxPts) {
+    // This sol errs by assuming all paths to a point are equally likely
+    public double new21Game0(int n, int k, int maxPts) {
+        if (n >= k - 1 + maxPts) {
             // n is the max possible score
             return 1;
         } // if
 
-        int[] paths = new int[k + maxPts];
+        long[] paths = new long[k + maxPts];
 
-        for (int i = 0; i < k; i++) {
+        // the first maxPts nums have an automatic +1 paths to be rolled
+        // ie paths after the first roll
+        for (int i = 1; i <= maxPts; i++) {
+            paths[i] = 1;
+        } // for i
+
+        for (int i = 1; i < k; i++) {
             for (int j = 1; j <= maxPts; j++) {
-                paths[i + j] += paths[i] + 1;
+                paths[i + j] += paths[i];
             } // for j
-            //System.out.printf("%d,", paths[i]); // debug
+        } // for i
+
+        for (int i = 0; i < paths.length; i++) {
+            System.out.printf("%d: %d\n", i, paths[i]); // debug
         } // for i
 
         long totalPathsToAnEnd = 0;
