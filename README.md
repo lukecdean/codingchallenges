@@ -1,3 +1,3 @@
 # Coding Problems
 
-leetcode and the like
+leetcode etc
