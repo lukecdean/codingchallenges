@@ -1,0 +1,37 @@
+class Solution {
+    public int countNicePairs(int[] nums) {
+        int res = 0;
+        int mod = 1_000_000_007;
+
+        Map<Integer, Integer> numsWithDelta = new HashMap<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            int n = nums[i];
+            //int r = Integer.valueOf(new StringBuilder(Integer.toString(n)).reverse().toString());
+            int r = getReverse(n);
+            int delta = r - n;
+
+            int matchingDeltas = numsWithDelta.getOrDefault(delta, 0);
+            res += matchingDeltas;
+
+            if (res > mod) {
+                res -= mod;
+            } // if
+
+            numsWithDelta.put(delta, matchingDeltas + 1);
+        } // for i
+
+        return res;
+    }
+
+    private int getReverse(int n) {
+        String ns = Integer.toString(n);
+        int r = 0;
+        for (int i = 0; i < ns.length(); i++) {
+            r *= 10;
+            r += Integer.valueOf(ns.charAt(i));
+        } // for i
+
+        return r;
+    } // getReverse()
+}
